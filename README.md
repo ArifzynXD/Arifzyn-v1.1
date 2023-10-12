@@ -1,5 +1,7 @@
-# Rules 
-[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#table-of-contents) 
+# Rules
+
+[![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/colored.png)](#table-of-contents)
+
 <p align="center">
   <img src="https://i.ibb.co/CnxQydQ/Project-A64497-D-1.png" width="100%" style="margin-left: auto;margin-right: auto;display: block;">
 </p>
@@ -42,9 +44,9 @@
   <a href='https://replit.com/'>
     <img src='https://pterodactyl.io/logos/pterry.svg' width='200px'>
   </a>
-</p> 
+</p>
 
-```bash 
+```bash
     1. Download Script Ini
     2. Tunggu Sampai Selesai Downloadnya
     3. Masuk Ke Panel Pterodactyl Dan Login
@@ -58,7 +60,8 @@
     11. Masuk Ke Console Server Kalian 12. Ketik npm install, dan tunggu selesai 13. terus ketik npm start, dan tunggu sampai muncul qr di conlose
 ```
 
-## ```Be Friends With Me```
+## `Be Friends With Me`
+
 <img src="https://github.com/anotherwebguy/anotherwebguy/blob/main/Handshake.gif" height="32px">
 <a href='https://wa.me/6289513081052'>
     <img align="left" width="26px" src="https://seeklogo.com/images/W/whatsapp-icon-logo-8CA4FB831E-seeklogo.com.png" />
@@ -70,9 +73,10 @@
     <img align="left" width="26px" src="https://www.freepnglogos.com/uploads/youtube-vector-logo-png-9.png"/>
 </a> &nbsp;&nbsp;
 
----------
+---
 
-## ```Whatsapp``` 
+## `Whatsapp`
+
 <a href="https://wa.me/6289513081052">
   <img align="left" width="26px" src="https://seeklogo.com/images/W/whatsapp-icon-logo-8CA4FB831E-seeklogo.com.png"/>
   
@@ -80,20 +84,25 @@
 ---------
 
 #### a little about this bot
-- [x] **Fast Respon** 
-- [x] **Simple** 
+
+- [x] **Fast Respon**
+- [x] **Simple**
 - [x] **Multi Device**
 - [x] **Support All Run**
----------
+
+---
+
 #### Some of the features include
-- [x] Downloader 
-- [x] Sticker 
-- [x] Game 
-- [x] Premium 
-- [x] Tools 
+
+- [x] Downloader
+- [x] Sticker
+- [x] Game
+- [x] Premium
+- [x] Tools
 - [x] Group
 - [x] Information
----------
+
+---
 
 ## `SETTING`
 
@@ -135,7 +144,7 @@ global.mess = {
     owner: 'Feature Only for _*owner*_',
     group: 'Feature Only for _*Group Chat*_',
     private: 'Feature Only for _*Private Chat*_',
-    wait: 'Wait a Moment, for Process',    
+    wait: 'Wait a Moment, for Process',
     error: '_*Sorry Features Error*_',
 }
 /* ~~~~~~~~~ THUMBNAIL ~~~~~~~~~ */
@@ -152,8 +161,11 @@ fs.watchFile(file, () => {
     require(file)
 })
 ```
----------
+
+---
+
 ## TERMUX USER
+
 ```bash
 $ pkg upgrade && pkg update
 $ pkg install git -y
@@ -162,16 +174,18 @@ $ pkg install ffmpeg -y
 $ pkg install imagemagick -y
 $ git clone https://github.com/AdrianTzy/Rxzy-MD-V1.2
 $ cd Rxzy-MD-V1.2
-$ npm i 
+$ npm i
 ```
 
 #### For android 10 and above don't use npm, use yarn install
+
 ```bash
 $ pkg install yarn -y
 $ yarn install
 ```
 
 ## Command Start Script
+
 ```bash
   For Use Pairing Code $ npm run code
   For start script $ npm start

@@ -48,7 +48,7 @@ const {
 } = require("@whiskeysockets/baileys");
 const readline = require("readline");
 const NodeCache = require("node-cache");
-const msgRetryCounterCache = new NodeCache();
+const msgRetryCounterCache = new NodeCache()
 
 const store = makeInMemoryStore({
   logger: pino().child({
@@ -64,61 +64,53 @@ const rl = readline.createInterface({
 });
 const question = (text) => new Promise((resolve) => rl.question(text, resolve));
 
-const connectToWhatsApp = async () => {
+const connectToWhatsApp = () => {
   const { state, saveCreds } = await useMultiFileAuthState(`./session`);
 
   const conn = connConnect({
-    printQRInTerminal: !pairingCode,
-    logger: pino({
-      level: "silent",
-    }),
-    browser: ["Chrome (Linux)", "", ""],
-    auth: state,
-    msgRetryCounterCache,
-    connectTimeoutMs: 60000,
-    defaultQueryTimeoutMs: 0,
-    keepAliveIntervalMs: 10000,
-    emitOwnEvents: true,
-    fireInitQueries: true,
-    generateHighQualityLinkPreview: true,
-    syncFullHistory: true,
-    markOnlineOnConnect: true,
+      printQRInTerminal: !pairingCode,
+      logger: pino({
+        level: "silent",
+      }),
+      browser: ["Chrome (Linux)", "", ""],
+      auth: state,
+      msgRetryCounterCache,
+      connectTimeoutMs: 60000,
+      defaultQueryTimeoutMs: 0,
+      keepAliveIntervalMs: 10000,
+      emitOwnEvents: true,
+      fireInitQueries: true,
+      generateHighQualityLinkPreview: true,
+      syncFullHistory: true,
+      markOnlineOnConnect: true,
   });
 
   if (pairingCode && !conn.authState.creds.registered) {
-    console.log(chalk.cyan("╭──────────────────────────────────────···"));
-    console.log(`📨 ${chalk.redBright("Please type your WhatsApp number")}:`);
-    console.log(chalk.cyan("├──────────────────────────────────────···"));
-    let phoneNumber = await question(`   ${chalk.cyan("- Number")}: `);
-    console.log(chalk.cyan("╰──────────────────────────────────────···"));
-    phoneNumber = phoneNumber.replace(/[^0-9]/g, "");
-    if (!Object.keys(PHONENUMBER_MCC).some((v) => phoneNumber.startsWith(v))) {
-      console.log(
-        chalk.cyan("╭─────────────────────────────────────────────────···"),
-      );
-      console.log(
-        `💬 ${chalk.redBright(
-          "Start with your country's WhatsApp code, Example 62xxx",
-        )}:`,
-      );
-      console.log(
-        chalk.cyan("╰─────────────────────────────────────────────────···"),
-      );
       console.log(chalk.cyan("╭──────────────────────────────────────···"));
       console.log(`📨 ${chalk.redBright("Please type your WhatsApp number")}:`);
       console.log(chalk.cyan("├──────────────────────────────────────···"));
-      phoneNumber = await question(`   ${chalk.cyan("- Number")}: `);
+      let phoneNumber = await question(`   ${chalk.cyan("- Number")}: `);
       console.log(chalk.cyan("╰──────────────────────────────────────···"));
       phoneNumber = phoneNumber.replace(/[^0-9]/g, "");
-    }
-    let code = await conn.requestPairingCode(phoneNumber);
-    code = code?.match(/.{1,4}/g)?.join("-") || code;
-    console.log(chalk.cyan("╭──────────────────────────────────────···"));
-    console.log(` 💻 ${chalk.redBright("Your Pairing Code")}:`);
-    console.log(chalk.cyan("├──────────────────────────────────────···"));
-    console.log(`   ${chalk.cyan("- Code")}: ${code}`);
-    console.log(chalk.cyan("╰──────────────────────────────────────···"));
-    rl.close();
+      if (!Object.keys(PHONENUMBER_MCC).some((v) => phoneNumber.startsWith(v))) {
+        console.log(chalk.cyan("╭─────────────────────────────────────────────────···"),);
+        console.log(`💬 ${chalk.redBright("Start with your country's WhatsApp code, Example 62xxx")}:`,);
+        console.log(chalk.cyan("╰─────────────────────────────────────────────────···"));
+        console.log(chalk.cyan("╭──────────────────────────────────────···"));
+        console.log(`📨 ${chalk.redBright("Please type your WhatsApp number")}:`,);
+        console.log(chalk.cyan("├──────────────────────────────────────···"));
+        phoneNumber = await question(`   ${chalk.cyan("- Number")}: `);
+        console.log(chalk.cyan("╰──────────────────────────────────────···"));
+        phoneNumber = phoneNumber.replace(/[^0-9]/g, "");
+      }
+      let code = await conn.requestPairingCode(phoneNumber);
+      code = code?.match(/.{1,4}/g)?.join("-") || code;
+      console.log(chalk.cyan("╭──────────────────────────────────────···"));
+      console.log(` 💻 ${chalk.redBright("Your Pairing Code")}:`);
+      console.log(chalk.cyan("├──────────────────────────────────────···"));
+      console.log(`   ${chalk.cyan("- Code")}: ${code}`);
+      console.log(chalk.cyan("╰──────────────────────────────────────···"));
+      rl.close();
   }
 
   store.bind(conn.ev);
@@ -425,7 +417,7 @@ const connectToWhatsApp = async () => {
     return buffer;
   };
   return conn;
-};
+}
 
 connectToWhatsApp();
 
