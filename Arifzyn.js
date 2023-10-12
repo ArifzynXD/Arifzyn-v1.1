@@ -144,7 +144,7 @@ if (waktu < "03:00:00") {
     var ucapanWaktu = 'Selamat Tengah Malam 🌃'
 }
 /* ~~~~~~~~~ STARTING & MODULE ALL ~~~~~~~~~ */
-module.exports = arxzy = async (arxzy, m, msg, chatUpdate, store) => {
+module.exports = conn = async (conn, m, msg, chatUpdate, store) => {
     try {
         /* ~~~~~~~~~ BASE ARXZYDEV ~~~~~~~~~ */
         const {
@@ -154,7 +154,7 @@ module.exports = arxzy = async (arxzy, m, msg, chatUpdate, store) => {
             now,
             fromMe
         } = m
-        var body = (m.mtype === 'conversation') ? m.message.conversation : (m.mtype == 'imageMessage') ? m.message.imageMessage.caption : (m.mtype == 'videoMessage') ? m.message.videoMessage.caption : (m.mtype == 'extendedTextMessage') ? m.message.extendedTextMessage.text : (m.mtype == 'buttonsResponseMessage') ? m.message.buttonsResponseMessage.selectedButtonId : (m.mtype == 'listResponseMessage') ? m.message.listResponseMessage.singleSelectnewReply.selectedRowId : (m.mtype == 'templateButtonnewReplyMessage') ? m.message.templateButtonnewReplyMessage.selectedId : (m.mtype === 'messageContextInfo') ? (m.message.buttonsResponseMessage?.selectedButtonId || m.message.listResponseMessage?.singleSelectnewReply.selectedRowId || m.text) : ''
+        var body = (m.mtype === 'conversation') ? m.message.conversation : (m.mtype == 'imageMessage') ? m.message.imageMessage.caption : (m.mtype == 'videoMessage') ? m.message.videoMessage.caption : (m.mtype == 'extendedTextMessage') ? m.message.extendedTextMessage.text : (m.mtype == 'buttonsResponseMessage') ? m.message.buttonsResponseMessage.selectedButtonId : (m.mtype == 'listResponseMessage') ? m.message.listResponseMessage.singleSelectm.reply.selectedRowId : (m.mtype == 'templateButtonm.replyMessage') ? m.message.templateButtonm.replyMessage.selectedId : (m.mtype === 'messageContextInfo') ? (m.message.buttonsResponseMessage?.selectedButtonId || m.message.listResponseMessage?.singleSelectm.reply.selectedRowId || m.text) : ''
         var budy = (typeof m.text == 'string' ? m.text : '')
         var prefix = ['.', '/'] ? /^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi.test(body) ? body.match(/^[°•π÷×¶∆£¢€¥®™+✓_=|~!?@#$%^&.©^]/gi)[0] : "" : prefa
         const isCmd = body.startsWith(prefix, '')
@@ -162,7 +162,7 @@ module.exports = arxzy = async (arxzy, m, msg, chatUpdate, store) => {
         const args = body.trim().split(/ +/).slice(1)
         const full_args = body.replace(command, '').slice(1).trim()
         const pushname = m.pushName || "No Name"
-        const botNumber = await arxzy.decodeJid(arxzy.user.id)
+        const botNumber = await conn.decodeJid(conn.user.id)
         const itsMe = m.sender == botNumber ? true : false
         const sender = m.sender
         const text = q = args.join(" ")
@@ -196,7 +196,7 @@ module.exports = arxzy = async (arxzy, m, msg, chatUpdate, store) => {
         const isAdrian = ('6289513081052@s.whatsapp.net').includes(m.sender)
         /* ~~~~~~~~~ GROUP SYSTEM ~~~~~~~~~ */
         const isGroup = m.key.remoteJid.endsWith('@g.us')
-        const groupMetadata = m.isGroup ? await arxzy.groupMetadata(m.chat).catch(e => {}) : ''
+        const groupMetadata = m.isGroup ? await conn.groupMetadata(m.chat).catch(e => {}) : ''
         const groupName = m.isGroup ? groupMetadata.subject : ''
         const participants = m.isGroup ? await groupMetadata.participants : ''
         const groupAdmins = m.isGroup ? await getGroupAdmins(participants) : ''
@@ -208,70 +208,50 @@ module.exports = arxzy = async (arxzy, m, msg, chatUpdate, store) => {
         const isCreator = [numberowner, ..._owner].map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').includes(m.sender)
         const isPremium = isCreator || isCreator || checkPremiumUser(m.sender, premium);
         const isUser = _user.includes(m.sender)
-        expiredCheck(arxzy, m, premium);
-        /* ~~~~~~~~~ REPLY ~~~~~~~~~ */
-        async function newReply(teks) {
-           if (typereply === 'v1') {
-               m.reply(teks)
-           } else if (typereplay === 'v2') {
-               arxzy.sendMessage(m.chat, {
-                  contextInfo: {
-                     externalAdReply: {
-                        showAdAttribution: true,
-                        title: global.namabot,
-                        body: jam(),
-                        previewType: "PHOTO",
-                        thumbnail: fs.readFileSync('./media/quoted.jpg'),
-                        sourceUrl: global.link
-                     }
-                  },
-                  text: teks
-               }, { quoted: m });
-           };
-        }
+        expiredCheck(conn, m, premium);
         /* ~~~~~~~~~ ALL SYSTEM BOT ~~~~~~~~~ */
-        if (!arxzy.public) {
+        if (!conn.public) {
             if (isCreator && !m.key.fromMe) return
         }
         if (autoread) {
-            arxzy.readMessages([m.key])
+            conn.readMessages([m.key])
         }
         if (autobio) {
-            arxzy.updateProfileStatus(`-`).catch(_ => _)
+            conn.updateProfileStatus(`-`).catch(_ => _)
         }
         if (chatUpdate['messages.upsert']) {
             const upsert = chatUpdate['messages.upsert']
             for (let msg of upsert.messages) {
                if (msg.key.remoteJid == 'status@broadcast' && !msg.key.fromMe && !msg.message?.protocolMessage) {
                   console.log(`Lihat status ${msg.pushName} ${msg.key.participant.split('@')[0]}\n`)
-                  arxzy.readMessages([msg.key])
+                  conn.readMessages([msg.key])
                }
             }
         } 
         if (isCommand) {
             let titida = ['composing', 'recording']
             yte = titida[Math.floor(titida.length * Math.random())]
-            arxzy.sendPresenceUpdate(yte, from)
+            conn.sendPresenceUpdate(yte, from)
         }
         if (m.sender.startsWith('212') && global.autoblok212 === true) {
-            return arxzy.updateBlockStatus(m.sender, 'block')
+            return conn.updateBlockStatus(m.sender, 'block')
         }
         if (!m.sender.startsWith('62') && global.onlyindo === true) {
-            return arxzy.updateBlockStatus(m.sender, 'block')
+            return conn.updateBlockStatus(m.sender, 'block')
         }
         let list = []
         for (let i of owner) {
             list.push({
-                displayName: arxzy.getName(i + '@s.whatsapp.net'),
+                displayName: conn.getName(i + '@s.whatsapp.net'),
                 vcard: `BEGIN:VCARD\n
 VERSION:3.0\n
-N:${arxzy.getName(i + '@s.whatsapp.net')}\n
-FN:${arxzy.getName(i + '@s.whatsapp.net')}\n
+N:${conn.getName(i + '@s.whatsapp.net')}\n
+FN:${conn.getName(i + '@s.whatsapp.net')}\n
 item1.TEL;waid=${i}:${i}\n
 item1.X-ABLabel:Ponsel\n
-item2.EMAIL;type=INTERNET:creator@arxzy.my.id\n
+item2.EMAIL;type=INTERNET:creator@conn.my.id\n
 item2.X-ABLabel:Email\n
-item3.URL:https://profile.arxzydev.xyz\n
+item3.URL:https://profile.conndev.xyz\n
 item3.X-ABLabel:Profile Website\n
 item4.ADR:;;Indonesia;;;;\n
 item4.X-ABLabel:Region\n
@@ -298,7 +278,7 @@ END:VCARD`
         for (let Mwuhehe of VnArxzy) {
             if (budy === Mwuhehe) {
                 let audiobuffy = fs.readFileSync(`./media/audio/${Mwuhehe}.mp3`)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     audio: audiobuffy,
                     mimetype: 'audio/mp4',
                     ptt: true
@@ -310,7 +290,7 @@ END:VCARD`
         for (let Mwuhehe of StickerArxzy) {
             if (budy === Mwuhehe) {
                 let stickerbuffy = fs.readFileSync(`./media/sticker/${Mwuhehe}.webp`)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     sticker: stickerbuffy
                 }, {
                     quoted: m
@@ -320,7 +300,7 @@ END:VCARD`
         for (let Mwuhehe of ImageArxzy) {
             if (budy === Mwuhehe) {
                 let imagebuffy = fs.readFileSync(`./media/image/${Mwuhehe}.jpg`)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     image: imagebuffy
                 }, {
                     quoted: m
@@ -330,7 +310,7 @@ END:VCARD`
         for (let Mwuhehe of VideoArxzy) {
             if (budy === Mwuhehe) {
                 let videobuffy = fs.readFileSync(`./media/video/${Mwuhehe}.mp4`)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     video: videobuffy
                 }, {
                     quoted: m
@@ -348,7 +328,7 @@ END:VCARD`
                 question,
                 step
             } = akinator[m.sender.split('@')[0]]
-            if (step == "0" && budy == "5") newReply("Maaf Anda telah mencapai pertanyaan pertama")
+            if (step == "0" && budy == "5") m.reply("Maaf Anda telah mencapai pertanyaan pertama")
             var ini_url = `https://api.lolhuman.xyz/api/akinator/answer?apikey=${lol}&server=${server}&frontaddr=${frontaddr}&session=${session}&signature=${signature}&answer=${budy}&step=${step}`
             var get_result = await fetchJson(ini_url)
             var get_result = get_result.result
@@ -357,7 +337,7 @@ END:VCARD`
                 var description = get_result.description
                 ini_txt = `${ini_name} - ${description}\n\n`
                 ini_txt += "*Terima Kasih*\n*Powered By ArxzyDev & LoL Human*"
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     image: {
                         url: get_result.image
                     },
@@ -397,7 +377,7 @@ END:VCARD`
                 ini_txt += "4 - Mungkin Tidak"
                 ini_txt += "5 - Kembali ke Pertanyaan Sebelumnya"
             }
-            arxzy.sendText(m.chat, ini_txt, m).then(() => {
+            conn.sendText(m.chat, ini_txt, m).then(() => {
                 const data_ = akinator[m.sender.split('@')[0]]
                 data_["question"] = question
                 data_["step"] = step
@@ -409,166 +389,166 @@ END:VCARD`
             kuis = true
             jawaban = tebakgambar[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebakgambar[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Gambar 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Gambar 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebakgambar[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = kuismath[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete kuismath[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await newReply(`🎮 Kuis Matematika  🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? kirim ${prefix}math mode`)
+                await m.reply(`🎮 Kuis Matematika  🎮\n\nJawaban Benar 🎉\n\nIngin bermain lagi? kirim ${prefix}math mode`)
                 delete kuismath[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebakasahotak.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebakasahotak[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebakasahotak[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Asah Otak 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Asah Otak 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebakasahotak[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebaksiapakahaku.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebaksiapakahaku[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebaksiapakahaku[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Siapakah Aku 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Siapakah Aku 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebaksiapakahaku[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebaksusunkata.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebaksusunkata[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebaksusunkata[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Susun Kata 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Susun Kata 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebaksusunkata[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebakbendera.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebakbendera[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebakbendera[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Gambar 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Gambar 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebakbendera[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebakbendera2.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebakbendera2[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebakbendera2[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Bendera 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Bendera 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebakbendera2[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebakkabupaten.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebakkabupaten[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebakkabupaten[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Kabupaten 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Kabupaten 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebakkabupaten[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebakkimia.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebakkimia[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebakkimia[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Kimia 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Kimia 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebakkimia[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebaktekateki.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebaktekateki[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebaktekateki[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Teka Teki 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Teka Teki 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebaktekateki[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebaklagu.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebaklagu[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebaklagu[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Lagu 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Lagu 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebaklagu[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebakkata.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebakkata[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebakkata[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Kata 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Kata 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebakkata[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebakkalimat.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebakkalimat[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebakkalimat[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Kalimat 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Kalimat 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebakkalimat[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebaklirik.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebaklirik[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebaklirik[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Lirik 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Lirik 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebaklirik[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         if (tebaktebakan.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
             kuis = true
             jawaban = tebaktebakan[m.sender.split('@')[0]]
             if (budy.toLowerCase() == "nyerah") {
-                await newReply('*Anda Telah menyerah*')
+                await m.reply('*Anda Telah menyerah*')
                 delete tebaktebakan[m.sender.split('@')[0]]
             } else if (budy.toLowerCase() == jawaban) {
-                await arxzy.sendText(m.chat, `🎮 Tebak Tebakan 🎮\n\nJawaban Benar 🎉`, m)
+                await conn.sendText(m.chat, `🎮 Tebak Tebakan 🎮\n\nJawaban Benar 🎉`, m)
                 delete tebaktebakan[m.sender.split('@')[0]]
-            } else newReply('*Jawaban Salah!*')
+            } else m.reply('*Jawaban Salah!*')
         }
         this.game = this.game ? this.game : {}
         let room = Object.values(this.game).find(room => room.id && room.game && room.state && room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender) && room.state == 'PLAYING')
@@ -577,14 +557,14 @@ END:VCARD`
             let isWin = !1
             let isTie = !1
             let isSurrender = !1
-            // newReply(`[DEBUG]\n${parseInt(m.text)}`)
+            // m.reply(`[DEBUG]\n${parseInt(m.text)}`)
             if (!/^([1-9]|(me)?nyerah|surr?ender|off|skip)$/i.test(m.text)) return
             isSurrender = !/^[1-9]$/.test(m.text)
             if (m.sender !== room.game.currentTurn) { // nek wayahku
                 if (!isSurrender) return !0
             }
             if (!isSurrender && 1 > (ok = room.game.turn(m.sender === room.game.playerO, parseInt(m.text) - 1))) {
-                newReply({
+                m.reply({
                     '-3': 'Game telah berakhir',
                     '-2': 'Invalid',
                     '-1': 'Posisi Invalid',
@@ -627,10 +607,10 @@ ${isWin ? `@${winner.split('@')[0]} Menang!` : isTie ? `Game berakhir` : `Gilira
 Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
             if ((room.game._currentTurn ^ isSurrender ? room.x : room.o) !== m.chat)
                 room[room.game._currentTurn ^ isSurrender ? 'x' : 'o'] = m.chat
-            if (room.x !== room.o) arxzy.sendText(room.x, str, m, {
+            if (room.x !== room.o) conn.sendText(room.x, str, m, {
                 mentions: parseMention(str)
             })
-            arxzy.sendText(room.o, str, m, {
+            conn.sendText(room.o, str, m, {
                 mentions: parseMention(str)
             })
             if (isTie || isWin) {
@@ -646,7 +626,7 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                     let getReason2 = afk.getAfkReason(getId2, _afk)
                     let getTimee = Date.now() - afk.getAfkTime(getId2, _afk)
                     let heheh2 = ms(getTimee)
-                    newReply(`Jangan tag, dia sedang afk\n\n*Reason :* ${getReason2}`)
+                    m.reply(`Jangan tag, dia sedang afk\n\n*Reason :* ${getReason2}`)
                 }
             }
             if (afk.checkAfkUser(m.sender, _afk)) {
@@ -656,112 +636,112 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 let heheh = ms(getTime)
                 _afk.splice(afk.getAfkPosition(m.sender, _afk), 1)
                 fs.writeFileSync('./src/data/user/afk-user.json', JSON.stringify(_afk))
-                arxzy.sendTextWithMentions(m.chat, `@${m.sender.split('@')[0]} telah kembali dari afk`, m)
+                conn.sendTextWithMentions(m.chat, `@${m.sender.split('@')[0]} telah kembali dari afk`, m)
             }
         }
         switch (isCommand) {
             case 'status': {
-                  if (!isCreator) return newReply(mess.owner)
-                  if (args.length < 1) return newReply('perilah apa?')
+                  if (!isCreator) return m.reply(mess.owner)
+                  if (args.length < 1) return m.reply('perilah apa?')
                   if (q === 'image') {
-                     let imgSw = await arxzy.downloadAndSaveMediaMessage(quoted)
-                     await arxzy.sendMessage('status@broadcast', { image: { url: imgSw }, caption: q}, { statusJidList: _user })
-                     newReply(mess.done)
+                     let imgSw = await conn.downloadAndSaveMediaMessage(quoted)
+                     await conn.sendMessage('status@broadcast', { image: { url: imgSw }, caption: q}, { statusJidList: _user })
+                     m.reply(mess.done)
                   } else if (/video/.test(mime)) {
-                     let VidSw = await arxzy.downloadAndSaveMediaMessage(quoted)
-                     await arxzy.sendMessage('status@broadcast', { video: { url: VidSw }, caption: q}, { statusJidList: _user })
-                     newReply(mess.done)
+                     let VidSw = await conn.downloadAndSaveMediaMessage(quoted)
+                     await conn.sendMessage('status@broadcast', { video: { url: VidSw }, caption: q}, { statusJidList: _user })
+                     m.reply(mess.done)
                   } else if (/audio/.test(mime)) {
-                     let VnSw = await arxzy.downloadAndSaveMediaMessage(quoted)
-                     await arxzy.sendMessage('status@broadcast', { audio: { url: VnSw }, mimetype: 'audio/mp4', ptt:true },{ backgroundColor: '#FF000000', statusJidList: _user })
-                     newReply(mess.done)
+                     let VnSw = await conn.downloadAndSaveMediaMessage(quoted)
+                     await conn.sendMessage('status@broadcast', { audio: { url: VnSw }, mimetype: 'audio/mp4', ptt:true },{ backgroundColor: '#FF000000', statusJidList: _user })
+                     m.reply(mess.done)
                   } else if (q) {
-                     arxzy.sendMessage('status@broadcast', { text: q }, { backgroundColor: '#FF000000', font: 3, statusJidList: _user });
+                     conn.sendMessage('status@broadcast', { text: q }, { backgroundColor: '#FF000000', font: 3, statusJidList: _user });
                   } else {
-                     newReply('Replay Media Jika Mau Dengan Caption Ketik .status caption')
+                     m.reply('Replay Media Jika Mau Dengan Caption Ketik .status caption')
                   }
                }
                break
             case 'autosimi':
-               if (!isCreator) return newReply(mess.owne)
-               if (args.length < 1) return newReply('perilah apa?')
+               if (!isCreator) return m.reply(mess.owne)
+               if (args.length < 1) return m.reply('perilah apa?')
                if (q == 'on') {
                   autosimi.push(from)
                   fs.writeFileSync('./src/data/simi.json', JSON.stringify(autosimi))
-                  newReply('Sukses mengaktifkan mode simi')
+                  m.reply('Sukses mengaktifkan mode simi')
                } else if (q == 'off') {
                   autosimi.splice(from, 1)
                   fs.writeFileSync('./src/data/simi.json', JSON.stringify(autosimi))
-                  newReply('Sukes menonaktifkan mode simi')
+                  m.reply('Sukes menonaktifkan mode simi')
                } else {
-                  newReply('Agak Laen')
+                  m.reply('Agak Laen')
                }
             break
             case 'setimgqouted':
             case 'siq': {
-                if (!isCreator) return newReply(mess.owner)
-                let delb = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isCreator) return m.reply(mess.owner)
+                let delb = await conn.downloadAndSaveMediaMessage(quoted)
                 await fsx.copy(delb, './media/quoted.jpg')
                 fs.unlinkSync(delb)
-                newReply(mess.done)
+                m.reply(mess.done)
             }
             break
             case 'setimgmenu':
             case 'sim': {
-                if (!isCreator) return newReply(mess.owner)
-                let delb = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isCreator) return m.reply(mess.owner)
+                let delb = await conn.downloadAndSaveMediaMessage(quoted)
                 await fsx.copy(delb, './media/menu.jpg')
                 fs.unlinkSync(delb)
-                newReply(mess.done)
+                m.reply(mess.done)
             }
             break
             case 'setvidmenu':
             case 'svm': {
-                if (!isCreator) return newReply(mess.owner)
-                let delb = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isCreator) return m.reply(mess.owner)
+                let delb = await conn.downloadAndSaveMediaMessage(quoted)
                 await fsx.copy(delb, './media/menu.mp4')
                 fs.unlinkSync(delb)
-                newReply(mess.done)
+                m.reply(mess.done)
             }
             break
             case 'addprem':
-                if (!isCreator) return newReply(mess.owner)
+                if (!isCreator) return m.reply(mess.owner)
                 if (args.length < 2)
-                    return newReply(`Penggunaan :\n*#addprem* @tag waktu\n*#addprem* nomor waktu\n\nContoh : #addprem @tag 30d`);
+                    return m.reply(`Penggunaan :\n*#addprem* @tag waktu\n*#addprem* nomor waktu\n\nContoh : #addprem @tag 30d`);
                 if (m.mentionedJid.length !== 0) {
                     for (let i = 0; i < m.mentionedJid.length; i++) {
                         addPremiumUser(m.mentionedJid[0], args[1], premium);
                     }
-                    newReply("Sukses Premium")
+                    m.reply("Sukses Premium")
                 } else {
                     addPremiumUser(args[0] + "@s.whatsapp.net", args[1], premium);
-                    newReply("Sukses Via Nomer")
+                    m.reply("Sukses Via Nomer")
                 }
                 break
             case 'delprem':
-                if (!isCreator) return newReply(mess.owner)
-                if (args.length < 1) return newReply(`Penggunaan :\n*#delprem* @tag\n*#delprem* nomor`);
+                if (!isCreator) return m.reply(mess.owner)
+                if (args.length < 1) return m.reply(`Penggunaan :\n*#delprem* @tag\n*#delprem* nomor`);
                 if (m.mentionedJid.length !== 0) {
                     for (let i = 0; i < m.mentionedJid.length; i++) {
                         premium.splice(getPremiumPosition(m.mentionedJid[i], premium), 1);
                         fs.writeFileSync("./src/data/premium.json", JSON.stringify(premium));
                     }
-                    newReply("Sukses Delete")
+                    m.reply("Sukses Delete")
                 } else {
                     premium.splice(getPremiumPosition(args[0] + "@s.whatsapp.net", premium), 1);
                     fs.writeFileSync("./src/data/premium.json", JSON.stringify(premium));
-                    newReply("Sukses Via Nomer")
+                    m.reply("Sukses Via Nomer")
                 }
                 break
             case 'listprem': {
-                if (!isCreator) return newReply(mess.owner)
+                if (!isCreator) return m.reply(mess.owner)
                 let data = require("./src/data/premium.json")
                 let txt = `*------「 LIST PREMIUM 」------*\n\n`
                 for (let i of data) {
                     txt += `Nomer : ${i.id}\n`
                     txt += `Expired : ${i.expired} Second\n`         
                 }                
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     text: txt,
                     mentions: i
                 }, {
@@ -771,55 +751,55 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
             break
             case 'delsesi':
             case 'clearsession': {
-                if (!isCreator) return newReply(mess.owner)
+                if (!isCreator) return m.reply(mess.owner)
                 fs.readdir("./session", async function(err, files) {
                     if (err) {
                         console.log('Unable to scan directory: ' + err);
-                        return newReply('Unable to scan directory: ' + err);
+                        return m.reply('Unable to scan directory: ' + err);
                     }
                     let filteredArray = await files.filter(item => item.startsWith("pre-key") ||
                         item.startsWith("sender-key") || item.startsWith("session-") || item.startsWith("app-state")
                     )
                     console.log(filteredArray.length);
                     let teks = `Terdeteksi ${filteredArray.length} file sampah\n\n`
-                    if (filteredArray.length == 0) return newReply(teks)
+                    if (filteredArray.length == 0) return m.reply(teks)
                     filteredArray.map(function(e, i) {
                         teks += (i + 1) + `. ${e}\n`
                     })
-                    newReply(teks)
+                    m.reply(teks)
                     await sleep(2000)
-                    newReply("Menghapus file sampah...")
+                    m.reply("Menghapus file sampah...")
                     await filteredArray.forEach(function(file) {
                         fs.unlinkSync(`./session/${file}`)
                     });
                     await sleep(2000)
-                    newReply("Berhasil menghapus semua sampah di folder session")
+                    m.reply("Berhasil menghapus semua sampah di folder session")
                 });
             }
             break
             case 'join':
                 try {
-                    if (!isCreator) return newReply(mess.owner)
-                    if (!text) return newReply('Masukkan Link Group!')
-                    if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) return newReply('Link Invalid!')
-                    newReply(mess.wait)
+                    if (!isCreator) return m.reply(mess.owner)
+                    if (!text) return m.reply('Masukkan Link Group!')
+                    if (!isUrl(args[0]) && !args[0].includes('whatsapp.com')) return m.reply('Link Invalid!')
+                    m.reply(mess.wait)
                     let result = args[0].split('https://chat.whatsapp.com/')[1]
-                    await arxzy.groupAcceptInvite(result).then((res) => newReply(json(res))).catch((err) => newReply(json(err)))
+                    await conn.groupAcceptInvite(result).then((res) => m.reply(json(res))).catch((err) => m.reply(json(err)))
                 } catch {
-                    newReply('Gagal Masuk Ke Group')
+                    m.reply('Gagal Masuk Ke Group')
                 }
                 break
             case 'cekapikey':
-                if (!isCreator) return newReply(mess.owner)
+                if (!isCreator) return m.reply(mess.owner)
                 let g = await fetchJson(`https://api.lolhuman.xyz/api/checkapikey?apikey=${lol}`)
-                newReply(q.result)
+                m.reply(q.result)
                 break
             case 'ambilsesi':
             case 'getsesi':
-                if (!isCreator) return newReply(mess.owner)
-                newReply('Tunggu Sebentar, Sedang mengambil file sesi mu')
+                if (!isCreator) return m.reply(mess.owner)
+                m.reply('Tunggu Sebentar, Sedang mengambil file sesi mu')
                 let sesi = fs.readFileSync('./src/total-hit-user.json')
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     document: sesi,
                     mimetype: 'application/json',
                     fileName: 'total-hit-user.json'
@@ -829,7 +809,7 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 break
             case 'myip':
             case 'ipbot':
-                if (!isCreator) return newReply(mess.owner)
+                if (!isCreator) return m.reply(mess.owner)
                 var http = require('http')
                 http.get({
                     'host': 'api.ipify.org',
@@ -837,74 +817,74 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                     'path': '/'
                 }, function(resp) {
                     resp.on('data', function(ip) {
-                        newReply("🔎 My public IP address is: " + ip);
+                        m.reply("🔎 My public IP address is: " + ip);
                     })
                 })
                 break
             case 'shutdown':
-                if (!isCreator) return newReply(mess.owner)
-                newReply(`Otsukaresama deshita🖐`)
+                if (!isCreator) return m.reply(mess.owner)
+                m.reply(`Otsukaresama deshita🖐`)
                 await sleep(3000)
                 process.exit()
                 break
             case 'restart':
-                if (!isCreator) return newReply(mess.owner)
-                newReply('Proses....')
+                if (!isCreator) return m.reply(mess.owner)
+                m.reply('Proses....')
                 exec('pm2 restart all')
                 break
             case 'autoread':
-                if (!isCreator) return newReply(mess.owner)
-                if (args.length < 1) return newReply(`Contoh ${prefix + command} on/off`)
+                if (!isCreator) return m.reply(mess.owner)
+                if (args.length < 1) return m.reply(`Contoh ${prefix + command} on/off`)
                 if (q === 'on') {
                     autoread = true
-                    newReply(`Berhasil mengubah autoread ke ${q}`)
+                    m.reply(`Berhasil mengubah autoread ke ${q}`)
                 } else if (q === 'off') {
                     autoread = false
-                    newReply(`Berhasil mengubah autoread ke ${q}`)
+                    m.reply(`Berhasil mengubah autoread ke ${q}`)
                 }
                 break
             case 'autobio':
-                if (!isCreator) return newReply(mess.owner)
-                if (args.length < 1) return newReply(`Example ${prefix + command} on/off`)
+                if (!isCreator) return m.reply(mess.owner)
+                if (args.length < 1) return m.reply(`Example ${prefix + command} on/off`)
                 if (q == 'on') {
                     autobio = true
-                    newReply(`Berhasil Mengubah AutoBio Ke ${q}`)
+                    m.reply(`Berhasil Mengubah AutoBio Ke ${q}`)
                 } else if (q == 'off') {
                     autobio = false
-                    newReply(`Berhasil Mengubah AutoBio Ke ${q}`)
+                    m.reply(`Berhasil Mengubah AutoBio Ke ${q}`)
                 }
                 break
             case 'mode':
-                if (!isCreator) return newReply(mess.owner)
-                if (args.length < 1) return newReply(`Example ${prefix + command} public/self`)
+                if (!isCreator) return m.reply(mess.owner)
+                if (args.length < 1) return m.reply(`Example ${prefix + command} public/self`)
                 if (q == 'public') {
-                    arxzy.public = true
-                    newReply(mess.done)
+                    conn.public = true
+                    m.reply(mess.done)
                 } else if (q == 'self') {
-                    arxzy.public = false
-                    newReply(mess.done)
+                    conn.public = false
+                    m.reply(mess.done)
                 }
                 break
             case 'setexif':
-                if (!isCreator) return newReply(mess.owner)
-                if (!text) return newReply(`Contoh : ${prefix + command} packname|author`)
+                if (!isCreator) return m.reply(mess.owner)
+                if (!text) return m.reply(`Contoh : ${prefix + command} packname|author`)
                 global.packname = text.split("|")[0]
                 global.author = text.split("|")[1]
-                newReply(`Exif berhasil diubah menjadi\n\n• Packname : ${global.packname}\n• Author : ${global.author}`)
+                m.reply(`Exif berhasil diubah menjadi\n\n• Packname : ${global.packname}\n• Author : ${global.author}`)
                 break
             case 'setpp':
             case 'setpp':
             case 'setppbot':
-                if (!isCreator) return newReply(mess.owner)
-                if (!quoted) return newReply(`Kirim/newReply Image Dengan Caption ${prefix + command}`)
-                if (!/image/.test(mime)) return newReply(`Kirim/newReply Image Dengan Caption ${prefix + command}`)
-                if (/webp/.test(mime)) return newReply(`Kirim/newReply Image Dengan Caption ${prefix + command}`)
-                var medis = await arxzy.downloadAndSaveMediaMessage(quoted, 'ppbot.jpeg')
+                if (!isCreator) return m.reply(mess.owner)
+                if (!quoted) return m.reply(`Kirim/m.reply Image Dengan Caption ${prefix + command}`)
+                if (!/image/.test(mime)) return m.reply(`Kirim/m.reply Image Dengan Caption ${prefix + command}`)
+                if (/webp/.test(mime)) return m.reply(`Kirim/m.reply Image Dengan Caption ${prefix + command}`)
+                var medis = await conn.downloadAndSaveMediaMessage(quoted, 'ppbot.jpeg')
                 if (args[0] == 'full') {
                     var {
                         img
                     } = await generateProfilePicture(medis)
-                    await arxzy.query({
+                    await conn.query({
                         tag: 'iq',
                         attrs: {
                             to: botNumber,
@@ -920,38 +900,38 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                         }]
                     })
                     fs.unlinkSync(medis)
-                    newReply(mess.done)
+                    m.reply(mess.done)
                 } else {
-                    var memeg = await arxzy.updateProfilePicture(botNumber, {
+                    var memeg = await conn.updateProfilePicture(botNumber, {
                         url: medis
                     })
                     fs.unlinkSync(medis)
-                    newReply(mess.done)
+                    m.reply(mess.done)
                 }
                 break
             case 'block':
-                if (!isCreator) return newReply(mess.owner)
+                if (!isCreator) return m.reply(mess.owner)
                 let blockw = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-                await arxzy.updateBlockStatus(blockw, 'block').then((res) => newReply(json(res))).catch((err) => newReply(json(err)))
+                await conn.updateBlockStatus(blockw, 'block').then((res) => m.reply(json(res))).catch((err) => m.reply(json(err)))
                 break
             case 'unblock':
-                if (!isCreator) return newReply(mess.owner)
+                if (!isCreator) return m.reply(mess.owner)
                 let blockww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-                await arxzy.updateBlockStatus(blockww, 'unblock').then((res) => newReply(json(res))).catch((err) => newReply(json(err)))
+                await conn.updateBlockStatus(blockww, 'unblock').then((res) => m.reply(json(res))).catch((err) => m.reply(json(err)))
                 break
             case 'leave':
-                if (!isCreator) return newReply(mess.owner)
-                if (!m.isGroup) return newReply(mess.group)
-                newReply('Dadah Semuanya 🥺')
-                await arxzy.groupLeave(m.chat)
+                if (!isCreator) return m.reply(mess.owner)
+                if (!m.isGroup) return m.reply(mess.group)
+                m.reply('Dadah Semuanya 🥺')
+                await conn.groupLeave(m.chat)
                 break
             case 'backup':
-                if (!isCreator) return newReply(mess.owner)
-                if (m.isGroup) return newReply(mess.private)
-                newReply(mess.wait)
+                if (!isCreator) return m.reply(mess.owner)
+                if (m.isGroup) return m.reply(mess.private)
+                m.reply(mess.wait)
                 exec('zip backup.zip *')
                 let malas = await fs.readFileSync('./backup.zip')
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     document: malas,
                     mimetype: 'application/zip',
                     fileName: 'backup.zip'
@@ -961,16 +941,16 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 break
             case 'bcgc':
             case 'bcgroup': {
-                if (!isCreator) return newReply(mess.owner)
-                if (!text) return newReply(`Text mana?\n\nContoh : ${prefix + command} Besok Libur `)
-                let getGroups = await arxzy.groupFetchAllParticipating()
+                if (!isCreator) return m.reply(mess.owner)
+                if (!text) return m.reply(`Text mana?\n\nContoh : ${prefix + command} Besok Libur `)
+                let getGroups = await conn.groupFetchAllParticipating()
                 let groups = Object.entries(getGroups).slice(0).map(entry => entry[1])
                 let anu = groups.map(v => v.id)
-                newReply(`Mengirim Broadcast Ke ${anu.length} Group Chat, Waktu Selesai ${anu.length * 1.5} detik`)
+                m.reply(`Mengirim Broadcast Ke ${anu.length} Group Chat, Waktu Selesai ${anu.length * 1.5} detik`)
                 for (let i of anu) {
                     await sleep(1500)
                     let a = '```' + `\n\n${text}\n\n` + '```' + '\n\n\nʙʀᴏᴀᴅᴄᴀsᴛ'
-                    arxzy.sendMessage(i, {
+                    conn.sendMessage(i, {
                         text: a,
                         contextInfo: {
                             externalAdReply: {
@@ -985,16 +965,16 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                         }
                     })
                 }
-                newReply(`Sukses Mengirim Broadcast Ke ${anu.length} Group`)
+                m.reply(`Sukses Mengirim Broadcast Ke ${anu.length} Group`)
             }
             break
             case 'getcase':
             case 'ambilcase':
-                if (!isCreator) return newReply(mess.owner)
+                if (!isCreator) return m.reply(mess.owner)
                 const getCase = (cases) => {
-                    return "case" + `'${cases}'` + fs.readFileSync("arxzy.js").toString().split('case \'' + cases + '\'')[1].split("break")[0] + "break"
+                    return "case" + `'${cases}'` + fs.readFileSync("conn.js").toString().split('case \'' + cases + '\'')[1].split("break")[0] + "break"
                 }
-                newReply(`${getCase(q)}`)
+                m.reply(`${getCase(q)}`)
                 break
 
 
@@ -1002,9 +982,9 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 /* ~~~~~~~~~ GROUP FEATURES ~~~~~~~~~ */
 
             case 'closetime':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 if (args[1] == 'detik') {
                     var timer = args[0] * `1000`
                 } else if (args[1] == 'menit') {
@@ -1014,20 +994,20 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 } else if (args[1] == 'hari') {
                     var timer = args[0] * `86400000`
                 } else {
-                    return newReply('*pilih:*\ndetik\nmenit\njam\n\n*contoh*\n10 detik')
+                    return m.reply('*pilih:*\ndetik\nmenit\njam\n\n*contoh*\n10 detik')
                 }
-                newReply(`Close time ${q} dimulai dari sekarang`)
+                m.reply(`Close time ${q} dimulai dari sekarang`)
                 setTimeout(() => {
                     var nomor = m.participant
                     const close = `*Tepat waktu* grup ditutup oleh admin\nsekarang hanya admin yang dapat mengirim pesan`
-                    arxzy.groupSettingUpdate(m.chat, 'announcement')
-                    newReply(close)
+                    conn.groupSettingUpdate(m.chat, 'announcement')
+                    m.reply(close)
                 }, timer)
                 break
             case 'opentime':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 if (args[1] == 'detik') {
                     var timer = args[0] * `1000`
                 } else if (args[1] == 'menit') {
@@ -1037,75 +1017,75 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 } else if (args[1] == 'hari') {
                     var timer = args[0] * `86400000`
                 } else {
-                    return newReply('*pilih:*\ndetik\nmenit\njam\n\n*contoh*\n10 detik')
+                    return m.reply('*pilih:*\ndetik\nmenit\njam\n\n*contoh*\n10 detik')
                 }
-                newReply(`Open time ${q} dimulai dari sekarang`)
+                m.reply(`Open time ${q} dimulai dari sekarang`)
                 setTimeout(() => {
                     var nomor = m.participant
                     const open = `*Tepat waktu* grup dibuka oleh admin\n sekarang member dapat mengirim pesan`
-                    arxzy.groupSettingUpdate(m.chat, 'not_announcement')
-                    newReply(open)
+                    conn.groupSettingUpdate(m.chat, 'not_announcement')
+                    m.reply(open)
                 }, timer)
                 break
             case 'kick':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 let blockwww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-                await arxzy.groupParticipantsUpdate(m.chat, [blockwww], 'remove').then((res) => newReply(json(res))).catch((err) => newReply(json(err)))
+                await conn.groupParticipantsUpdate(m.chat, [blockwww], 'remove').then((res) => m.reply(json(res))).catch((err) => m.reply(json(err)))
                 break
             case 'add':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 let blockwwww = m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-                await arxzy.groupParticipantsUpdate(m.chat, [blockwwww], 'add').then((res) => newReply(json(res))).catch((err) => newReply(json(err)))
+                await conn.groupParticipantsUpdate(m.chat, [blockwwww], 'add').then((res) => m.reply(json(res))).catch((err) => m.reply(json(err)))
                 break
             case 'promote':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 let blockwwwww = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-                await arxzy.groupParticipantsUpdate(m.chat, [blockwwwww], 'promote').then((res) => newReply(json(res))).catch((err) => newReply(json(err)))
+                await conn.groupParticipantsUpdate(m.chat, [blockwwwww], 'promote').then((res) => m.reply(json(res))).catch((err) => m.reply(json(err)))
                 break
             case 'demote':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 let blockwwwwwa = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text.replace(/[^0-9]/g, '') + '@s.whatsapp.net'
-                await arxzy.groupParticipantsUpdate(m.chat, [blockwwwwwa], 'demote').then((res) => newReply(json(res))).catch((err) => newReply(json(err)))
+                await conn.groupParticipantsUpdate(m.chat, [blockwwwwwa], 'demote').then((res) => m.reply(json(res))).catch((err) => m.reply(json(err)))
                 break
             case 'setname':
             case 'setsubject':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 if (!text) return 'Text ?'
-                await arxzy.groupUpdateSubject(m.chat, text).then((res) => newReply(mess.success)).catch((err) => newReply(json(err)))
+                await conn.groupUpdateSubject(m.chat, text).then((res) => m.reply(mess.success)).catch((err) => m.reply(json(err)))
                 break
             case 'setdesc':
             case 'setdesk':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 if (!text) return 'Text ?'
-                await arxzy.groupUpdateDescription(m.chat, text).then((res) => newReply(mess.success)).catch((err) => newReply(json(err)))
+                await conn.groupUpdateDescription(m.chat, text).then((res) => m.reply(mess.success)).catch((err) => m.reply(json(err)))
                 break
             case 'setppgroup':
             case 'setppgrup':
             case 'setppgc':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
-                if (!quoted) return newReply(`Kirim/newReply Image Dengan Caption ${prefix + command}`)
-                if (!/image/.test(mime)) return newReply(`Kirim/newReply Image Dengan Caption ${prefix + command}`)
-                if (/webp/.test(mime)) return newReply(`Kirim/newReply Image Dengan Caption ${prefix + command}`)
-                var medis = await arxzy.downloadAndSaveMediaMessage(quoted, 'ppbot.jpeg')
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
+                if (!quoted) return m.reply(`Kirim/m.reply Image Dengan Caption ${prefix + command}`)
+                if (!/image/.test(mime)) return m.reply(`Kirim/m.reply Image Dengan Caption ${prefix + command}`)
+                if (/webp/.test(mime)) return m.reply(`Kirim/m.reply Image Dengan Caption ${prefix + command}`)
+                var medis = await conn.downloadAndSaveMediaMessage(quoted, 'ppbot.jpeg')
                 if (args[0] == 'full') {
                     var {
                         img
                     } = await generateProfilePicture(medis)
-                    await arxzy.query({
+                    await conn.query({
                         tag: 'iq',
                         attrs: {
                             to: m.chat,
@@ -1121,26 +1101,26 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                         }]
                     })
                     fs.unlinkSync(medis)
-                    newReply(mess.done)
+                    m.reply(mess.done)
                 } else {
-                    var memeg = await arxzy.updateProfilePicture(m.chat, {
+                    var memeg = await conn.updateProfilePicture(m.chat, {
                         url: medis
                     })
                     fs.unlinkSync(medis)
-                    newReply(mess.done)
+                    m.reply(mess.done)
                 }
                 break
             case 'tagall':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 let teks = `ダ TAG FOR ADMIN ダ
  
                   *MESSAGE: ${q ? q : 'kosong'}*\n\n`
                 for (let mem of participants) {
                     teks += `◈ @${mem.id.split('@')[0]}\n`
                 }
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     text: teks,
                     mentions: participants.map(a => a.id)
                 }, {
@@ -1148,10 +1128,10 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 })
                 break
             case 'hidetag':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
-                arxzy.sendMessage(m.chat, {
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
+                conn.sendMessage(m.chat, {
                     text: q ? q : '',
                     mentions: participants.map(a => a.id)
                 }, {
@@ -1159,67 +1139,67 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 })
                 break
             case 'totag':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
-                if (!isAdmins) return newReply(mess.admin)
-                if (!m.quoted) return newReply(`Reply pesan dengan caption ${prefix + command}`)
-                arxzy.sendMessage(m.chat, {
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
+                if (!isAdmins) return m.reply(mess.admin)
+                if (!m.quoted) return m.reply(`Reply pesan dengan caption ${prefix + command}`)
+                conn.sendMessage(m.chat, {
                     forward: m.quoted.fakeObj,
                     mentions: participants.map(a => a.id)
                 })
                 break
             case 'group':
             case 'grup':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 if (args[0] === 'close') {
-                    await arxzy.groupSettingUpdate(m.chat, 'announcement').then((res) => newReply(`Sukses Menutup Group 🕊️`)).catch((err) => newReply(json(err)))
+                    await conn.groupSettingUpdate(m.chat, 'announcement').then((res) => m.reply(`Sukses Menutup Group 🕊️`)).catch((err) => m.reply(json(err)))
                 } else if (args[0] === 'open') {
-                    await arxzy.groupSettingUpdate(m.chat, 'not_announcement').then((res) => newReply(`Sukses Membuka Group 🕊️`)).catch((err) => newReply(json(err)))
+                    await conn.groupSettingUpdate(m.chat, 'not_announcement').then((res) => m.reply(`Sukses Membuka Group 🕊️`)).catch((err) => m.reply(json(err)))
                 } else {
-                    newReply(`Mode ${command}\n\n\nKetik ${prefix + command}open/close`)
+                    m.reply(`Mode ${command}\n\n\nKetik ${prefix + command}open/close`)
                 }
                 break
             case 'editinfo':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
                 if (args[0] === 'open') {
-                    await arxzy.groupSettingUpdate(m.chat, 'unlocked').then((res) => newReply(`Sukses Membuka Edit Info Group 🕊️`)).catch((err) => newReply(json(err)))
+                    await conn.groupSettingUpdate(m.chat, 'unlocked').then((res) => m.reply(`Sukses Membuka Edit Info Group 🕊️`)).catch((err) => m.reply(json(err)))
                 } else if (args[0] === 'close') {
-                    await arxzy.groupSettingUpdate(m.chat, 'locked').then((res) => newReply(`Sukses Menutup Edit Info Group 🕊️`)).catch((err) => newReply(json(err)))
+                    await conn.groupSettingUpdate(m.chat, 'locked').then((res) => m.reply(`Sukses Menutup Edit Info Group 🕊️`)).catch((err) => m.reply(json(err)))
                 } else {
-                    newReply(`Mode ${command}\n\n\nKetik ${prefix + command}on/off`)
+                    m.reply(`Mode ${command}\n\n\nKetik ${prefix + command}on/off`)
                 }
                 break
             case 'linkgroup':
             case 'linkgrup':
             case 'linkgc':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
-                let response = await arxzy.groupInviteCode(m.chat)
-                arxzy.sendText(m.chat, `👥 *INFO LINK GROUP*\n📛 *Nama :* ${groupMetadata.subject}\n👤 *Owner Grup :* ${groupMetadata.owner !== undefined ? '@' + groupMetadata.owner.split`@`[0] : 'Tidak diketahui'}\n🌱 *ID :* ${groupMetadata.id}\n🔗 *Link Chat :* https://chat.whatsapp.com/${response}\n👥 *Member :* ${groupMetadata.participants.length}\n`, m, {
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
+                let response = await conn.groupInviteCode(m.chat)
+                conn.sendText(m.chat, `👥 *INFO LINK GROUP*\n📛 *Nama :* ${groupMetadata.subject}\n👤 *Owner Grup :* ${groupMetadata.owner !== undefined ? '@' + groupMetadata.owner.split`@`[0] : 'Tidak diketahui'}\n🌱 *ID :* ${groupMetadata.id}\n🔗 *Link Chat :* https://chat.whatsapp.com/${response}\n👥 *Member :* ${groupMetadata.participants.length}\n`, m, {
                     detectLink: true
                 })
                 break
             case 'revoke':
             case 'resetlink':
-                if (!m.isGroup) return newReply(mess.group)
-                if (!isAdmins && !isGroupOwner && !isCreator) return newReply(mess.admin)
-                if (!isBotAdmins) return newReply(mess.botAdmin)
-                await arxzy.groupRevokeInvite(m.chat)
+                if (!m.isGroup) return m.reply(mess.group)
+                if (!isAdmins && !isGroupOwner && !isCreator) return m.reply(mess.admin)
+                if (!isBotAdmins) return m.reply(mess.botAdmin)
+                await conn.groupRevokeInvite(m.chat)
                     .then(res => {
-                        newReply(`Sukses Menyetel Ulang, Tautan Undangan Grup ${groupMetadata.subject}`)
-                    }).catch((err) => newReply(json(err)))
+                        m.reply(`Sukses Menyetel Ulang, Tautan Undangan Grup ${groupMetadata.subject}`)
+                    }).catch((err) => m.reply(json(err)))
                 break
             case 'listonline':
             case 'liston':
-                if (!m.isGroup) newReply(mess.group)
+                if (!m.isGroup) m.reply(mess.group)
                 let id = args && /\d+\-\d+@g.us/.test(args[0]) ? args[0] : m.chat
                 let online = [...Object.keys(store.presences[id]), botNumber]
-                arxzy.sendText(m.chat, '⏰ List Online:\n\n' + online.map(v => '🌱 @' + v.replace(/@.+/, '')).join`\n`, m, {
+                conn.sendText(m.chat, '⏰ List Online:\n\n' + online.map(v => '🌱 @' + v.replace(/@.+/, '')).join`\n`, m, {
                     mentions: online
                 })
                 break
@@ -1274,7 +1254,7 @@ ${cpus[0].model.trim()} (${cpu.speed} MHZ)\n${Object.keys(cpu.times).map(type =>
 _CPU Core(s) Usage (${cpus.length} Core CPU)_
 ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Object.keys(cpu.times).map(type => `- *${(type + '*').padEnd(6)}: ${(100 * cpu.times[type] / cpu.total).toFixed(2)}%`).join('\n')}`).join('\n\n')}` : ''}
 `.trim()
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     text: respon,
                     contextInfo: {
                         externalAdReply: {
@@ -1295,7 +1275,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             case 'buypremium':
             case 'premiumuser': {
                 let teks = `Hi ${pushname}👋\n Ingin Beli Premium? Chat Saja Owner😉`
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     text: teks,
                     contextInfo: {
                         externalAdReply: {
@@ -1315,10 +1295,10 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             case 'sewa':
             case 'sewabot':
-                newReply(`Ketik ${prefix}owner Saja`)
+                m.reply(`Ketik ${prefix}owner Saja`)
                 break
             case 'speedtest': {
-                newReply('Testing Speed...')
+                m.reply('Testing Speed...')
                 let cp = require('child_process')
                 let {
                     promisify
@@ -1334,7 +1314,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                         stdout,
                         stderr
                     } = o
-                    if (stdout.trim()) arxzy.sendMessage(m.chat, {
+                    if (stdout.trim()) conn.sendMessage(m.chat, {
                         text: stdout,
                         contextInfo: {
                             externalAdReply: {
@@ -1350,7 +1330,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                     }, {
                         quoted: m
                     })
-                    if (stderr.trim()) arxzy.sendMessage(m.chat, {
+                    if (stderr.trim()) conn.sendMessage(m.chat, {
                         text: stderr,
                         contextInfo: {
                             externalAdReply: {
@@ -1371,7 +1351,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             case 'runtime':
                 let pinga = `Bot Telah Berjalan Selama ${runtime(process.uptime())}`
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     text: pinga,
                     contextInfo: {
                         externalAdReply: {
@@ -1392,13 +1372,13 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             case 'script':
             case 'scriptbot':
                 uy = `https://youtube.com/playlist?list=PLRmLRCoejWJsauHXGmkKERWnptlwtOy2q`
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     text: uy,
                     contextInfo: {
                         externalAdReply: {
                             showAdAttribution: true,
                             title: 'Script Free',
-                            body: `SCRIPT BOT ${namabot} Ada Di Youtube @arxzydev`,
+                            body: `SCRIPT BOT ${namabot} Ada Di Youtube @conndev`,
                             thumbnailUrl: 'https://telegra.ph/file/0720685135c68851ca869.jpg',
                             sourceUrl: global.link,
                             mediaType: 1,
@@ -1412,7 +1392,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             case 'donate':
             case 'donasi':
                 let katanya = `Hallo Kakak ${pushname}\n\nJika Ingin Berdonasi Menggunakan QRIS\n\n\n*NOTES:*\n 1.Bawa Bukti Telah Berdonasi Kepada Owner!!!\nSeberapa Pun Kakak Berdonasi Bagi Kami Sangat Berharga`
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     image: fs.readFileSync('./media/qris.jpg'),
                     caption: katanya
                 }, {
@@ -1420,7 +1400,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                 })
                 break
             case "owner": {
-                arxzy.sendMessage(from, {
+                conn.sendMessage(from, {
                     contacts: {
                         displayName: `${list.length} Kontak`,
                         contacts: list
@@ -1431,7 +1411,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             }
             break
             case 'tqto':
-                newReply(`*Terima Kasih Kepada*\n\n>| 1. ArxzyDev ( Author )\n>| 2. LoL Human ( Rest APIs )\n>| 3. ZTRAM ( Team )\n>| 4. Penyedia Module\n>| 5. Subscriber & Creator Bot WhatsApp\n\n\n\n\n\n Powered By ArxzyDev`)
+                m.reply(`*Terima Kasih Kepada*\n\n>| 1. ArxzyDev ( Author )\n>| 2. LoL Human ( Rest APIs )\n>| 3. ZTRAM ( Team )\n>| 4. Penyedia Module\n>| 5. Subscriber & Creator Bot WhatsApp\n\n\n\n\n\n Powered By ArxzyDev`)
                 break
 
 
@@ -1439,38 +1419,38 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             case 'sticker':
             case 'stiker':
             case 's': {
-                if (!quoted) return newReply(`Balas Video/Image Dengan Caption ${prefix + command}`)
+                if (!quoted) return m.reply(`Balas Video/Image Dengan Caption ${prefix + command}`)
                 if (/image/.test(mime)) {
                     let media = await quoted.download()
-                    let encmedia = await arxzy.sendImageAsSticker(m.chat, media, m, {
+                    let encmedia = await conn.sendImageAsSticker(m.chat, media, m, {
                         packname: packname,
                         author: author
                     })
                     await fs.unlinkSync(encmedia)
                 } else if (isVideo || /video/.test(mime)) {
-                    if ((quoted.msg || quoted).seconds > 11) return newReply('Maksimal 10 detik!')
+                    if ((quoted.msg || quoted).seconds > 11) return m.reply('Maksimal 10 detik!')
                     let media = await quoted.download()
-                    let encmedia = await arxzy.sendVideoAsSticker(m.chat, media, m, {
+                    let encmedia = await conn.sendVideoAsSticker(m.chat, media, m, {
                         packname: packname,
                         author: author
                     })
                     await fs.unlinkSync(encmedia)
                 } else {
-                    return newReply(`Kirim Gambar/Video Dengan Caption ${prefix + command}\nDurasi Video 1-9 Detik`)
+                    return m.reply(`Kirim Gambar/Video Dengan Caption ${prefix + command}\nDurasi Video 1-9 Detik`)
                 }
             }
             break
             case 'smeme': {
                 let respond = `Kirim/Reply image/sticker dengan caption ${prefix + command} text1|text2`
-                if (!/image/.test(mime)) return newReply(respond)
-                if (!text) return newReply(respond)
-                newReply(mess.wait)
+                if (!/image/.test(mime)) return m.reply(respond)
+                if (!text) return m.reply(respond)
+                m.reply(mess.wait)
                 atas = text.split('|')[0] ? text.split('|')[0] : '-'
                 bawah = text.split('|')[1] ? text.split('|')[1] : '-'
-                let dwnld = await arxzy.downloadAndSaveMediaMessage(qmsg)
+                let dwnld = await conn.downloadAndSaveMediaMessage(qmsg)
                 let fatGans = await TelegraPh(dwnld)
                 let smeme = `https://api.memegen.link/images/custom/${encodeURIComponent(bawah)}/${encodeURIComponent(atas)}.png?background=${fatGans}`
-                let pop = await arxzy.sendImageAsSticker(m.chat, smeme, m, {
+                let pop = await conn.sendImageAsSticker(m.chat, smeme, m, {
                     packname: packname,
                     author: author
                 })
@@ -1479,41 +1459,41 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             /* case 'swm': {
                 let [teks1, teks2] = text.split`|`
-                if (!teks1) return newReply(`Kirim/Reply image/video dengan caption ${prefix + command} teks1|teks2`)
-                if (!teks2) return newReply(`Kirim/Reply image/video dengan caption ${prefix + command} teks1|teks2`)
-                newReply(mess.wait)
+                if (!teks1) return m.reply(`Kirim/Reply image/video dengan caption ${prefix + command} teks1|teks2`)
+                if (!teks2) return m.reply(`Kirim/Reply image/video dengan caption ${prefix + command} teks1|teks2`)
+                m.reply(mess.wait)
                 if (/image/.test(mime)) {
-                    let media = await arxzy.downloadMediaMessage(qmsg)
-                    let encmedia = await arxzy.sendImageAsSticker(m.chat, media, m, {
+                    let media = await conn.downloadMediaMessage(qmsg)
+                    let encmedia = await conn.sendImageAsSticker(m.chat, media, m, {
                         packname: teks1,
                         author: teks2
                     })
                     await fs.unlinkSync(encmedia)
                 } else if (/video/.test(mime)) {
-                    if ((quoted.msg || quoted).seconds > 11) return newReply('Maksimal 10 detik!')
-                    let media = await arxzy.downloadMediaMessage(qmsg)
-                    let encmedia = await arxzy.sendVideoAsSticker(m.chat, media, m, {
+                    if ((quoted.msg || quoted).seconds > 11) return m.reply('Maksimal 10 detik!')
+                    let media = await conn.downloadMediaMessage(qmsg)
+                    let encmedia = await conn.sendVideoAsSticker(m.chat, media, m, {
                         packname: teks1,
                         author: teks2
                     })
                     await fs.unlinkSync(encmedia)
                 } else {
-                    return newReply(`Kirim Gambar/Video Dengan Caption ${prefix + command}\nDurasi Video 1-9 Detik`)
+                    return m.reply(`Kirim Gambar/Video Dengan Caption ${prefix + command}\nDurasi Video 1-9 Detik`)
                 }
             }
             break
             */
             case 'toimage':
             case 'toimg': {
-                if (!/webp/.test(mime)) return newReply(`Reply sticker dengan caption *${prefix + command}*`)
-                newReply(mess.wait)
-                let media = await arxzy.downloadAndSaveMediaMessage(qmsg)
+                if (!/webp/.test(mime)) return m.reply(`Reply sticker dengan caption *${prefix + command}*`)
+                m.reply(mess.wait)
+                let media = await conn.downloadAndSaveMediaMessage(qmsg)
                 let ran = await getRandom('.png')
                 exec(`ffmpeg -i ${media} ${ran}`, (err) => {
                     fs.unlinkSync(media)
                     if (err) return err
                     let buffer = fs.readFileSync(ran)
-                    arxzy.sendMessage(m.chat, {
+                    conn.sendMessage(m.chat, {
                         image: buffer
                     }, {
                         quoted: m
@@ -1525,11 +1505,11 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             case 'tomp4':
             case 'tovideo': {
-                if (!/webp/.test(mime)) return newReply(`newReply stiker dengan caption *${prefix + command}*`)
-                newReply(mess.wait)
-                let media = await arxzy.downloadAndSaveMediaMessage(qmsg)
+                if (!/webp/.test(mime)) return m.reply(`m.reply stiker dengan caption *${prefix + command}*`)
+                m.reply(mess.wait)
+                let media = await conn.downloadAndSaveMediaMessage(qmsg)
                 let webpToMp4 = await webp2mp4File(media)
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     video: {
                         url: webpToMp4.result,
                         caption: 'Convert Webp To Video'
@@ -1543,11 +1523,11 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             case 'toaud':
             case 'toaudio': {
-                if (!/video/.test(mime) && !/audio/.test(mime)) return newReply(`Kirim/newReply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`)
-                newReply(mess.wait)
-                let media = await arxzy.downloadMediaMessage(qmsg)
+                if (!/video/.test(mime) && !/audio/.test(mime)) return m.reply(`Kirim/m.reply Video/Audio Yang Ingin Dijadikan Audio Dengan Caption ${prefix + command}`)
+                m.reply(mess.wait)
+                let media = await conn.downloadMediaMessage(qmsg)
                 let audio = await toAudio(media, 'mp4')
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     audio: audio,
                     mimetype: 'audio/mpeg'
                 }, {
@@ -1557,11 +1537,11 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             }
             break
             case 'tomp3': {
-                if (!/video/.test(mime) && !/audio/.test(mime)) return newReply(`Kirim/newReply Video/Audio Yang Ingin Dijadikan MP3 Dengan Caption ${prefix + command}`)
-                newReply(mess.wait)
-                let media = await arxzy.downloadMediaMessage(qmsg)
+                if (!/video/.test(mime) && !/audio/.test(mime)) return m.reply(`Kirim/m.reply Video/Audio Yang Ingin Dijadikan MP3 Dengan Caption ${prefix + command}`)
+                m.reply(mess.wait)
+                let media = await conn.downloadMediaMessage(qmsg)
                 let audio = await toAudio(media, 'mp4')
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     document: audio,
                     mimetype: 'audio/mp3',
                     fileName: `Arxzy-MD.mp3`
@@ -1573,14 +1553,14 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             case 'tovn':
             case 'toptt': {
-                if (!/video/.test(mime) && !/audio/.test(mime)) return newReply(`newReply Video/Audio Yang Ingin Dijadikan VN Dengan Caption ${prefix + command}`)
-                newReply(mess.wait)
-                let media = await arxzy.downloadMediaMessage(qmsg)
+                if (!/video/.test(mime) && !/audio/.test(mime)) return m.reply(`m.reply Video/Audio Yang Ingin Dijadikan VN Dengan Caption ${prefix + command}`)
+                m.reply(mess.wait)
+                let media = await conn.downloadMediaMessage(qmsg)
                 let {
                     toPTT
                 } = require('./lib/converter')
                 let audio = await toPTT(media, 'mp4')
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     audio: audio,
                     mimetype: 'audio/mpeg',
                     ptt: true
@@ -1591,11 +1571,11 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             }
             break
             case 'togif': {
-                if (!/webp/.test(mime)) return newReply(`newReply stiker dengan caption *${prefix + command}*`)
-                newReply(mess.wait)
-                let media = await arxzy.downloadAndSaveMediaMessage(qmsg)
+                if (!/webp/.test(mime)) return m.reply(`m.reply stiker dengan caption *${prefix + command}*`)
+                m.reply(mess.wait)
+                let media = await conn.downloadAndSaveMediaMessage(qmsg)
                 let webpToMp4 = await webp2mp4File(media)
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     video: {
                         url: webpToMp4.result,
                         caption: 'Convert Webp To Video'
@@ -1609,14 +1589,14 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             }
             break
             case 'tourl': {
-                newReply(mess.wait)
-                let media = await arxzy.downloadAndSaveMediaMessage(qmsg)
+                m.reply(mess.wait)
+                let media = await conn.downloadAndSaveMediaMessage(qmsg)
                 if (/image/.test(mime)) {
                     let anu = await TelegraPh(media)
-                    newReply(util.format(anu))
+                    m.reply(util.format(anu))
                 } else if (!/image/.test(mime)) {
                     let anu = await UploadFileUgu(media)
-                    newReply(util.format(anu))
+                    m.reply(util.format(anu))
                 }
                 await fs.unlinkSync(media)
 
@@ -1624,11 +1604,11 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             case 'snobg': {
                 let respond = `Kirim Atau Reply Gambar Dengan Caption ${prefix + command}`
-                if (!/image/.test(mime)) return newReply(respond)
-                let dwnld = await arxzy.downloadAndSaveMediaMessage(qmsg)
+                if (!/image/.test(mime)) return m.reply(respond)
+                let dwnld = await conn.downloadAndSaveMediaMessage(qmsg)
                 let fatGans = await TelegraPh(dwnld)
                 let smeme = `https://api.lolhuman.xyz/api/removebg?apikey=${lol}&img=${fatGans}`
-                let pop = await arxzy.sendImageAsSticker(m.chat, smeme, m, {
+                let pop = await conn.sendImageAsSticker(m.chat, smeme, m, {
                     packname: packname,
                     author: author
                 })
@@ -1637,12 +1617,12 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             case 'emojimix2': {
                 let [emoji1, emoji2] = text.split`+`
-                if (!emoji1) return newReply(`Contoh : ${prefix + command} 😅+🤔`)
-                if (!emoji2) return newReply(`Contoh : ${prefix + command} 😅+🤔`)
-                newReply(mess.wait)
+                if (!emoji1) return m.reply(`Contoh : ${prefix + command} 😅+🤔`)
+                if (!emoji2) return m.reply(`Contoh : ${prefix + command} 😅+🤔`)
+                m.reply(mess.wait)
                 let anu = await fetchJson(`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=proactive&collection=emoji_kitchen_v5&q=${encodeURIComponent(emoji1)}_${encodeURIComponent(emoji2)}`)
                 for (let res of anu.results) {
-                    let encmedia = await arxzy.sendImageAsSticker(m.chat, res.url, m, {
+                    let encmedia = await conn.sendImageAsSticker(m.chat, res.url, m, {
                         packname: global.packname,
                         author: global.author,
                         categories: res.tags
@@ -1652,10 +1632,10 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             }
             break
             case 'emojimix1': {
-                if (!text) return newReply(`Contoh : ${prefix + command} 😅`)
+                if (!text) return m.reply(`Contoh : ${prefix + command} 😅`)
                 let anu = await fetchJson(`https://tenor.googleapis.com/v2/featured?key=AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ&contentfilter=high&media_filter=png_transparent&component=proactive&collection=emoji_kitchen_v5&q=${encodeURIComponent(text)}`)
                 for (let res of anu.results) {
-                    let encmedia = await arxzy.sendImageAsSticker(m.chat, res.url, m, {
+                    let encmedia = await conn.sendImageAsSticker(m.chat, res.url, m, {
                         packname: global.packname,
                         author: global.author,
                         categories: res.tags
@@ -1666,10 +1646,10 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             break
             case 'toonce':
             case 'toviewonce': {
-                if (!quoted) return newReply(`Reply Image/Video`)
+                if (!quoted) return m.reply(`Reply Image/Video`)
                 if (/image/.test(mime)) {
-                    anuan = await arxzy.downloadAndSaveMediaMessage(quoted)
-                    arxzy.sendMessage(m.chat, {
+                    anuan = await conn.downloadAndSaveMediaMessage(quoted)
+                    conn.sendMessage(m.chat, {
                         image: {
                             url: anuan
                         },
@@ -1680,8 +1660,8 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                         quoted: m
                     })
                 } else if (/video/.test(mime)) {
-                    anuanuan = await arxzy.downloadAndSaveMediaMessage(quoted)
-                    arxzy.sendMessage(m.chat, {
+                    anuanuan = await conn.downloadAndSaveMediaMessage(quoted)
+                    conn.sendMessage(m.chat, {
                         video: {
                             url: anuanuan
                         },
@@ -1695,7 +1675,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             }
             break
             case 'toqr': {
-                if (!q) return newReply(' Please include link or text!')
+                if (!q) return m.reply(' Please include link or text!')
                 const QrCode = require('qrcode-reader')
                 const qrcode = require('qrcode')
                 let qyuer = await qrcode.toDataURL(q, {
@@ -1705,7 +1685,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                 let buff = getRandom('.jpg')
                 await fs.writeFileSync('./' + buff, data)
                 let medi = fs.readFileSync('./' + buff)
-                await arxzy.sendMessage(from, {
+                await conn.sendMessage(from, {
                     image: medi,
                     caption: "Here you go!"
                 }, {
@@ -1717,23 +1697,23 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             }
             break
             case 'fliptext': {
-                if (args.length < 1) return newReply(`Example:\n${prefix}fliptext ArxzyDev`)
+                if (args.length < 1) return m.reply(`Example:\n${prefix}fliptext ArxzyDev`)
                 quere = args.join(" ")
                 flipe = quere.split('').reverse().join('')
-                newReply(`\`\`\`「 FLIP TEXT 」\`\`\`\n*•> Normal :*\n${quere}\n*•> Flip :*\n${flipe}`)
+                m.reply(`\`\`\`「 FLIP TEXT 」\`\`\`\n*•> Normal :*\n${quere}\n*•> Flip :*\n${flipe}`)
             }
             break
             /* ~~~~~~~~~ INFORMATION. FEATURED ~~~~~~~~~ */
             case 'infogempa':
                 let k = await fetchJson(`https://api.lolhuman.xyz/api/infogempa?apikey=${lol}`)
-                newReply(mess.wait)
+                m.reply(mess.wait)
                 var caption = `Lokasi : ${k.result.lokasi}\n`
                 caption += `Waktu : ${k.result.waktu}\n`
                 caption += `Potensi : ${k.result.potensi}\n`
                 caption += `Magnitude : ${k.result.magnitude}\n`
                 caption += `Kedalaman : ${k.result.kedalaman}\n`
                 caption += `Koordinat : ${k.result.koordinat}`
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     image: {
                         url: k.result.map
                     },
@@ -1749,7 +1729,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                     teks += `│⭔ ${x}\n`
                 }
                 teks += `│\n└────────────⭓\n\n*Total : ${VnArxzy.length}*`
-                newReply(teks)
+                m.reply(teks)
             }
             break
             case 'liststicker': {
@@ -1758,7 +1738,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                     teks += `│⭔ ${x}\n`
                 }
                 teks += `│\n└────────────⭓\n\n*Total : ${StickerArxzy.length}*`
-                newReply(teks)
+                m.reply(teks)
             }
             break
             case 'listimage': {
@@ -1767,7 +1747,7 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                     teks += `│⭔ ${x}\n`
                 }
                 teks += `│\n└────────────⭓\n\n*Total : ${ImageArxzy.length}*`
-                newReply(teks)
+                m.reply(teks)
             }
             break
             case 'listvideo': {
@@ -1776,99 +1756,99 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
                     teks += `│⭔ ${x}\n`
                 }
                 teks += `│\n└────────────⭓\n\n*Total : ${VideoArxzy.length}*`
-                newReply(teks)
+                m.reply(teks)
             }
             break
             case 'addvideo': {
-                if (!isPremium) return newReply(mess.prem)
-                if (args.length < 1) return newReply('Nama Videonya?')
-                if (VideoArxzy.includes(q)) return newReply("Nama Yang Kamu Masukan Sudah Ada")
-                let delb = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isPremium) return m.reply(mess.prem)
+                if (args.length < 1) return m.reply('Nama Videonya?')
+                if (VideoArxzy.includes(q)) return m.reply("Nama Yang Kamu Masukan Sudah Ada")
+                let delb = await conn.downloadAndSaveMediaMessage(quoted)
                 VideoArxzy.push(q)
                 await fsx.copy(delb, `./media/video/${q}.mp4`)
                 fs.writeFileSync('./src/media/video.json', JSON.stringify(VideoArxzy))
                 fs.unlinkSync(delb)
-                newReply(`Success Menambahkan Video\nUntuk Melihat Ketik ${prefix}listvideo`)
+                m.reply(`Success Menambahkan Video\nUntuk Melihat Ketik ${prefix}listvideo`)
             }
             break
             case 'delvideo': {
-                if (!isPremium) return newReply(mess.prem)
-                if (args.length < 1) return newReply('Masukan Nama Video')
-                if (!VideoArxzy.includes(q)) return newReply("Nama Tidak Ada Di Dalam Database")
+                if (!isPremium) return m.reply(mess.prem)
+                if (args.length < 1) return m.reply('Masukan Nama Video')
+                if (!VideoArxzy.includes(q)) return m.reply("Nama Tidak Ada Di Dalam Database")
                 let wanu = VideoArxzy.indexOf(q)
                 VideoArxzy.splice(wanu, 1)
                 fs.writeFileSync('./src/media/video.json', JSON.stringify(VideoArxzy))
                 fs.unlinkSync(`./media/video/${q}.mp4`)
-                newReply(`Success Sukses Menghapus Video ${q}`)
+                m.reply(`Success Sukses Menghapus Video ${q}`)
             }
             break
             case 'addimage': {
-                if (!isPremium) return newReply(mess.prem)
-                if (args.length < 1) return newReply('Nama Imagenya?')
-                if (ImageArxzy.includes(q)) return newReply("Nama Yang Kamu Masukan Sudah Terdaftar Di Dalam Database")
-                let delb = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isPremium) return m.reply(mess.prem)
+                if (args.length < 1) return m.reply('Nama Imagenya?')
+                if (ImageArxzy.includes(q)) return m.reply("Nama Yang Kamu Masukan Sudah Terdaftar Di Dalam Database")
+                let delb = await conn.downloadAndSaveMediaMessage(quoted)
                 ImageArxzy.push(q)
                 await fsx.copy(delb, `./media/image/${q}.jpg`)
                 fs.writeFileSync('./src/media/image.json', JSON.stringify(ImageArxzy))
                 fs.unlinkSync(delb)
-                newReply(`Sukses Menambahkan Image\nUntuk Cek Ketik ${prefix}listimage`)
+                m.reply(`Sukses Menambahkan Image\nUntuk Cek Ketik ${prefix}listimage`)
             }
             break
             case 'delimage': {
-                if (!isPremium) return newReply(mess.prem)
-                if (args.length < 1) return newReply('Masukan Nama Imagenya')
-                if (!ImageArxzy.includes(q)) return newReply("Nama Image Yang Kamu Masukan Tidak Terdaftar")
+                if (!isPremium) return m.reply(mess.prem)
+                if (args.length < 1) return m.reply('Masukan Nama Imagenya')
+                if (!ImageArxzy.includes(q)) return m.reply("Nama Image Yang Kamu Masukan Tidak Terdaftar")
                 let wanu = ImageArxzy.indexOf(q)
                 ImageArxzy.splice(wanu, 1)
                 fs.writeFileSync('./src/media/image.json', JSON.stringify(ImageArxzy))
                 fs.unlinkSync(`./media/image/${q}.jpg`)
-                newReply(`Suksed Menghapus Image ${q}`)
+                m.reply(`Suksed Menghapus Image ${q}`)
             }
             break
             case 'addsticker': {
-                if (!isPremium) return newReply(mess.prem)
-                if (args.length < 1) return newReply('Masukan Nama Stickernya?')
-                if (StickerArxzy.includes(q)) return newReply("Nama Telah Di Pakai")
-                let delb = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isPremium) return m.reply(mess.prem)
+                if (args.length < 1) return m.reply('Masukan Nama Stickernya?')
+                if (StickerArxzy.includes(q)) return m.reply("Nama Telah Di Pakai")
+                let delb = await conn.downloadAndSaveMediaMessage(quoted)
                 StickerArxzy.push(q)
                 await fsx.copy(delb, `./media/sticker/${q}.webp`)
                 fs.writeFileSync('./src/media/sticker.json', JSON.stringify(StickerArxzy))
                 fs.unlinkSync(delb)
-                newReply(`Sukses Menambahkan Sticker\nUntuk Mengecek Ketik ${prefix}liststicker`)
+                m.reply(`Sukses Menambahkan Sticker\nUntuk Mengecek Ketik ${prefix}liststicker`)
             }
             break
             case 'delsticker': {
-                if (!isPremium) return newReply(mess.prem)
-                if (args.length < 1) return newReply('Masukan Nama Stickernya')
-                if (!StickerArxzy.includes(q)) return newReply("Nama Tidak Terdaftar Di Database")
+                if (!isPremium) return m.reply(mess.prem)
+                if (args.length < 1) return m.reply('Masukan Nama Stickernya')
+                if (!StickerArxzy.includes(q)) return m.reply("Nama Tidak Terdaftar Di Database")
                 let wanu = StickerArxzy.indexOf(q)
                 StickerArxzy.splice(wanu, 1)
                 fs.writeFileSync('./src/media/sticker.json', JSON.stringify(StickerArxzy))
                 fs.unlinkSync(`./media/sticker/${q}.webp`)
-                newReply(`Sukses Menghapus Sticker ${q}`)
+                m.reply(`Sukses Menghapus Sticker ${q}`)
             }
             break
             case 'addvn': {
-                if (!isPremium) return newReply(mess.prem)
-                if (args.length < 1) return newReply('Masukan Namanya?')
-                if (VnArxzy.includes(q)) return newReply("Nama Telah Di Pakai")
-                let delb = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isPremium) return m.reply(mess.prem)
+                if (args.length < 1) return m.reply('Masukan Namanya?')
+                if (VnArxzy.includes(q)) return m.reply("Nama Telah Di Pakai")
+                let delb = await conn.downloadAndSaveMediaMessage(quoted)
                 VnArxzy.push(q)
                 await fsx.copy(delb, `./media/audio/${q}.mp3`)
                 fs.writeFileSync('./src/media/vn.json', JSON.stringify(VnArxzy))
                 fs.unlinkSync(delb)
-                newReply(`Sukses Menambahkan Audio\nUntuk Mengecek Ketik ${prefix}listvn`)
+                m.reply(`Sukses Menambahkan Audio\nUntuk Mengecek Ketik ${prefix}listvn`)
             }
             break
             case 'delvn': {
-                if (!isPremium) return newReply(mess.prem)
-                if (args.length < 1) return newReply('Masukan Namanya')
-                if (!VnArxzy.includes(q)) return newReply("Nama Tidak Terdaftar Di Database")
+                if (!isPremium) return m.reply(mess.prem)
+                if (args.length < 1) return m.reply('Masukan Namanya')
+                if (!VnArxzy.includes(q)) return m.reply("Nama Tidak Terdaftar Di Database")
                 let wanu = VnArxzy.indexOf(q)
                 VnArxzy.splice(wanu, 1)
                 fs.writeFileSync('./src/media/vn.json', JSON.stringify(VnArxzy))
                 fs.unlinkSync(`./media/audio/${q}.mp3`)
-                newReply(`Sukses Menghapus Audio ${q}`)
+                m.reply(`Sukses Menghapus Audio ${q}`)
             }
             break
 
@@ -1881,10 +1861,10 @@ ${cpus.map((cpu, i) => `${i + 1}. ${cpu.model.trim()} (${cpu.speed} MHZ)\n${Obje
             case 'tictactoe': {
                 let TicTacToe = require("./lib/tictactoe")
                 this.game = this.game ? this.game : {}
-                if (Object.values(this.game).find(room => room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender))) return newReply('Kamu masih didalam game')
+                if (Object.values(this.game).find(room => room.id.startsWith('tictactoe') && [room.game.playerX, room.game.playerO].includes(m.sender))) return m.reply('Kamu masih didalam game')
                 let room = Object.values(this.game).find(room => room.state === 'WAITING' && (text ? room.name === text : true))
                 if (room) {
-                    newReply('Partner ditemukan!')
+                    m.reply('Partner ditemukan!')
                     room.o = m.chat
                     room.game.playerO = m.sender
                     room.state = 'PLAYING'
@@ -1912,10 +1892,10 @@ ${arr.slice(6).join('')}
 Menunggu @${room.game.currentTurn.split('@')[0]}
 
 Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
-                    if (room.x !== room.o) await arxzy.sendText(room.x, str, m, {
+                    if (room.x !== room.o) await conn.sendText(room.x, str, m, {
                         mentions: parseMention(str)
                     })
-                    await arxzy.sendText(room.o, str, m, {
+                    await conn.sendText(room.o, str, m, {
                         mentions: parseMention(str)
                     })
                 } else {
@@ -1927,7 +1907,7 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                         state: 'WAITING'
                     }
                     if (text) room.name = text
-                    newReply('Menunggu partner' + (text ? ` mengetik command dibawah ini ${prefix}${command} ${text}` : ''))
+                    m.reply('Menunggu partner' + (text ? ` mengetik command dibawah ini ${prefix}${command} ${text}` : ''))
                     this.game[room.id] = room
                 }
             }
@@ -1938,12 +1918,12 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 try {
                     if (this.game) {
                         delete this.game
-                        arxzy.sendText(m.chat, `Berhasil delete session TicTacToe`, m)
+                        conn.sendText(m.chat, `Berhasil delete session TicTacToe`, m)
                     } else if (!this.game) {
-                        newReply(`Session TicTacToe🎮 tidak ada`)
+                        m.reply(`Session TicTacToe🎮 tidak ada`)
                     } else mewReply('?')
                 } catch (e) {
-                    newReply('rusak')
+                    m.reply('rusak')
                 }
             }
             break
@@ -1953,12 +1933,12 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
                 let poin = 10
                 let poin_lose = 10
                 let timeout = 60000
-                if (Object.values(this.suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.sender))) newReply(`Selesaikan suit mu yang sebelumnya`)
-                if (m.mentionedJid[0] === m.sender) return newReply(`Tidak bisa bermain dengan diri sendiri !`)
-                if (!m.mentionedJid[0]) return newReply(`_Siapa yang ingin kamu tantang?_\nTag orangnya..\n\nContoh : ${prefix}suit @${_owner[1]}`, m.chat, {
+                if (Object.values(this.suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.sender))) m.reply(`Selesaikan suit mu yang sebelumnya`)
+                if (m.mentionedJid[0] === m.sender) return m.reply(`Tidak bisa bermain dengan diri sendiri !`)
+                if (!m.mentionedJid[0]) return m.reply(`_Siapa yang ingin kamu tantang?_\nTag orangnya..\n\nContoh : ${prefix}suit @${_owner[1]}`, m.chat, {
                     mentions: [_owner[1] + '@s.whatsapp.net']
                 })
-                if (Object.values(this.suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) return newReply(`Orang yang kamu tantang sedang bermain suit bersama orang lain :(`)
+                if (Object.values(this.suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) return m.reply(`Orang yang kamu tantang sedang bermain suit bersama orang lain :(`)
                 let id = 'suit_' + new Date() * 1
                 let caption = `_*SUIT PvP*_
 
@@ -1966,7 +1946,7 @@ Ketik *nyerah* untuk menyerah dan mengakui kekalahan`
 
 Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 this.suit[id] = {
-                    chat: await arxzy.sendText(m.chat, caption, m, {
+                    chat: await conn.sendText(m.chat, caption, m, {
                         mentions: parseMention(caption)
                     }),
                     id: id,
@@ -1974,7 +1954,7 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                     p2: m.mentionedJid[0],
                     status: 'wait',
                     waktu: setTimeout(() => {
-                        if (this.suit[id]) arxzy.sendText(m.chat, `_Waktu suit habis_`, m)
+                        if (this.suit[id]) conn.sendText(m.chat, `_Waktu suit habis_`, m)
                         delete this.suit[id]
                     }, 60000),
                     poin,
@@ -1985,30 +1965,30 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             break
             case 'kuismath':
             case 'math': {
-                if (kuismath.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                if (kuismath.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                 let {
                     genMath,
                     modes
                 } = require('./lib/math')
-                if (!text) return newReply(`Mode: ${Object.keys(modes).join(' | ')}\nContoh _useran: ${prefix}math medium`)
+                if (!text) return m.reply(`Mode: ${Object.keys(modes).join(' | ')}\nContoh _useran: ${prefix}math medium`)
                 let result = await genMath(text.toLowerCase())
-                arxzy.sendText(m.chat, `*Berapa hasil dari: ${result.soal.toLowerCase()}*?\n\nWaktu: ${(result.waktu / 1000).toFixed(2)} detik`, m).then(() => {
+                conn.sendText(m.chat, `*Berapa hasil dari: ${result.soal.toLowerCase()}*?\n\nWaktu: ${(result.waktu / 1000).toFixed(2)} detik`, m).then(() => {
                     kuismath[m.sender.split('@')[0]] = result.jawaban
                 })
                 await sleep(result.waktu)
                 if (kuismath.hasOwnProperty(m.sender.split('@')[0])) {
                     console.log("Jawaban: " + result.jawaban)
-                    newReply("Waktu Habis\nJawaban: " + kuismath[m.sender.split('@')[0]])
+                    m.reply("Waktu Habis\nJawaban: " + kuismath[m.sender.split('@')[0]])
                     delete kuismath[m.sender.split('@')[0]]
                 }
             }
             break
             case 'tebak': {
                 if (args[0] === 'gambar') {
-                    if (tebakgambar.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebakgambar.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakgambar.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendMessage(m.chat, {
+                    conn.sendMessage(m.chat, {
                         image: {
                             url: result.img
                         },
@@ -2021,66 +2001,66 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                     await sleep(60000)
                     if (tebakgambar.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakgambar[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakgambar[m.sender.split('@')[0]]}`, m)
                         delete tebakgambar[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'kata') {
-                    if (tebakkata.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebakkata.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakkata.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\n${result.soal}\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\n${result.soal}\nWaktu : 60s`, m).then(() => {
                         tebakkata[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebakkata.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakkata[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakkata[m.sender.split('@')[0]]}`, m)
                         delete tebakkata[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'kalimat') {
-                    if (tebakkalimat.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebakkalimat.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakkalimat.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\n${result.soal}\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\n${result.soal}\nWaktu : 60s`, m).then(() => {
                         tebakkalimat[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebakkalimat.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakkalimat[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakkalimat[m.sender.split('@')[0]]}`, m)
                         delete tebakkalimat[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'lirik') {
-                    if (tebaklirik.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebaklirik.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebaklirik.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Ini Adalah Lirik Dari Lagu? : *${result.soal}*?\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Ini Adalah Lirik Dari Lagu? : *${result.soal}*?\nWaktu : 60s`, m).then(() => {
                         tebaklirik[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebaklirik.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaklirik[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaklirik[m.sender.split('@')[0]]}`, m)
                         delete tebaklirik[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'tebakan') {
-                    if (tebaktebakan.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebaktebakan.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebaktebakan.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Jawablah Pertanyaan Berikut : *${result.soal}*?\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Jawablah Pertanyaan Berikut : *${result.soal}*?\nWaktu : 60s`, m).then(() => {
                         tebaktebakan[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebaktebakan.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaktebakan[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaktebakan[m.sender.split('@')[0]]}`, m)
                         delete tebaktebakan[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'bendera') {
-                    if (tebakbendera.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebakbendera.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakbendera.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendMessage(m.chat, {
+                    conn.sendMessage(m.chat, {
                         image: {
                             url: result.img
                         },
@@ -2093,14 +2073,14 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                     await sleep(60000)
                     if (tebakbendera.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.name)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakbendera[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakbendera[m.sender.split('@')[0]]}`, m)
                         delete tebakbendera[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'bendera2') {
-                    if (tebakbendera2.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebakbendera2.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakbendera2.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendMessage(m.chat, {
+                    conn.sendMessage(m.chat, {
                         image: {
                             url: result.img
                         },
@@ -2113,97 +2093,97 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                     await sleep(60000)
                     if (tebakbendera2.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.name)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakbendera2[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakbendera2[m.sender.split('@')[0]]}`, m)
                         delete tebakbendera2[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'kabupaten') {
-                    if (tebakkabupaten.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebakkabupaten.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakkabupaten.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendImage(m.chat, result.url, `Silahkan Jawab Gambar Berikut\n\nWaktu : 60s`, m).then(() => {
+                    conn.sendImage(m.chat, result.url, `Silahkan Jawab Gambar Berikut\n\nWaktu : 60s`, m).then(() => {
                         tebakkabupaten[m.sender.split('@')[0]] = result.title.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebakkabupaten.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.title)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakkabupaten[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakkabupaten[m.sender.split('@')[0]]}`, m)
                         delete tebakkabupaten[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'kimia') {
-                    if (tebakkimia.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebakkimia.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tebakkimia.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nUnsur : ${result.unsur}\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nUnsur : ${result.unsur}\nWaktu : 60s`, m).then(() => {
                         tebakkimia[m.sender.split('@')[0]] = result.lambang.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebakkimia.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.lambang)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakkimia[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakkimia[m.sender.split('@')[0]]}`, m)
                         delete tebakkimia[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'asahotak') {
-                    if (tebakasahotak.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebakasahotak.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/asahotak.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nSoal : ${result.soal}\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nSoal : ${result.soal}\nWaktu : 60s`, m).then(() => {
                         tebakasahotak[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebakasahotak.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakasahotak[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebakasahotak[m.sender.split('@')[0]]}`, m)
                         delete tebakasahotak[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'siapakahaku') {
-                    if (tebaksiapakahaku.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebaksiapakahaku.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/siapakahaku.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nSoal : ${result.soal}\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nSoal : ${result.soal}\nWaktu : 60s`, m).then(() => {
                         tebaksiapakahaku[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebaksiapakahaku.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaksiapakahaku[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaksiapakahaku[m.sender.split('@')[0]]}`, m)
                         delete tebaksiapakahaku[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'susunkata') {
-                    if (tebaksusunkata.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebaksusunkata.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/susunkata.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nSoal : ${result.soal}\nTipe : ${result.tipe}\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nSoal : ${result.soal}\nTipe : ${result.tipe}\nWaktu : 60s`, m).then(() => {
                         tebaksusunkata[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebaksusunkata.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaksusunkata[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaksusunkata[m.sender.split('@')[0]]}`, m)
                         delete tebaksusunkata[m.sender.split('@')[0]]
                     }
                 } else if (args[0] === 'tekateki') {
-                    if (tebaktekateki.hasOwnProperty(m.sender.split('@')[0])) return newReply("Masih Ada Sesi Yang Belum Diselesaikan!")
+                    if (tebaktekateki.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Masih Ada Sesi Yang Belum Diselesaikan!")
                     let anu = await fetchJson('https://raw.githubusercontent.com/BochilTeam/database/master/games/tekateki.json')
                     let result = anu[Math.floor(Math.random() * anu.length)]
-                    arxzy.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nSoal : ${result.soal}\nWaktu : 60s`, m).then(() => {
+                    conn.sendText(m.chat, `Silahkan Jawab Pertanyaan Berikut\n\nSoal : ${result.soal}\nWaktu : 60s`, m).then(() => {
                         tebaktekateki[m.sender.split('@')[0]] = result.jawaban.toLowerCase()
                     })
                     await sleep(60000)
                     if (tebaktekateki.hasOwnProperty(m.sender.split('@')[0])) {
                         console.log("Jawaban: " + result.jawaban)
-                        arxzy.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaktekateki[m.sender.split('@')[0]]}`, m)
+                        conn.sendText(m.chat, `Waktu Habis\nJawaban:  ${tebaktekateki[m.sender.split('@')[0]]}`, m)
                         delete tebaktekateki[m.sender.split('@')[0]]
                     }
                 }
             }
             break
             case 'akinator':
-                newReply(`Akinator adalah sebuah permainan dan aplikasi perangkat bergerak yang berupaya menebak secara rinci dan pasti isi pikiran Pengguna permainan ini melalui serentetan pertanyaan.\n\n~> ${prefix}akinatorstart : Untuk memulai\n~> ${prefix}akinatorstop : Untuk berhenti`)
+                m.reply(`Akinator adalah sebuah permainan dan aplikasi perangkat bergerak yang berupaya menebak secara rinci dan pasti isi pikiran Pengguna permainan ini melalui serentetan pertanyaan.\n\n~> ${prefix}akinatorstart : Untuk memulai\n~> ${prefix}akinatorstop : Untuk berhenti`)
                 break
             case 'akinatorstart':
-                if (!isPremium) return newReply(mess.prem)
-                if (m.isGroup) return newReply(mess.private)
-                if (akinator.hasOwnProperty(m.sender.split('@')[0])) return newReply("Selesein yg sebelumnya dulu atuh")
+                if (!isPremium) return m.reply(mess.prem)
+                if (m.isGroup) return m.reply(mess.private)
+                if (akinator.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Selesein yg sebelumnya dulu atuh")
                 get_result = await fetchJson(`https://api.lolhuman.xyz/api/akinator/start?apikey=${lol}`)
                 let {
                     server, frontaddr, session, signature, question, step
@@ -2221,31 +2201,31 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 imi_txt += "2 - Saya Tidak Tau\n"
                 imi_txt += "3 - Mungkin\n"
                 imi_txt += "4 - Mungkin Tidak"
-                arxzy.sendText(m.chat, imi_txt, m).then(() => {
+                conn.sendText(m.chat, imi_txt, m).then(() => {
                     akinator[m.sender.split('@')[0]] = data
                     fs.writeFileSync("./src/data/akinator.json", JSON.stringify(akinator))
                 })
                 break
             case 'akinatorstop':
-                if (!akinator.hasOwnProperty(m.sender.split('@')[0])) return newReply("Anda tidak memiliki akinator sebelumnya")
+                if (!akinator.hasOwnProperty(m.sender.split('@')[0])) return m.reply("Anda tidak memiliki akinator sebelumnya")
                 delete akinator[m.sender.split('@')[0]]
                 fs.writeFileSync("./src/data/akinator.json", JSON.stringify(akinator))
-                newReply("Success mengcancel akinator sebelumnya")
+                m.reply("Success mengcancel akinator sebelumnya")
                 break
 
             case 'afk':
-                if (!m.isGroup) return newReply(mess.group)
-                if (isAfkOn) return newReply("Kakak Sudah Afk Sebelumnya")
+                if (!m.isGroup) return m.reply(mess.group)
+                if (isAfkOn) return m.reply("Kakak Sudah Afk Sebelumnya")
                 let reason = text ? text : 'Nothing.'
                 afk.addAfkUser(m.sender, Date.now(), reason, _afk)
-                newReply(`@${m.sender.split('@')[0]} Sedang AFK\nDengan Alasan : ${reason}`)
+                m.reply(`@${m.sender.split('@')[0]} Sedang AFK\nDengan Alasan : ${reason}`)
                 break
             case 'ask':
             case 'openai': {
-                if (!isPremium) return newReply(mess.prem)
-                if (!full_args) return newReply('What are you looking for in this bot')
+                if (!isPremium) return m.reply(mess.prem)
+                if (!full_args) return m.reply('What are you looking for in this bot')
                 let d = await fetchJson(`https://xzn.wtf/api/openai?text=${full_args}&apikey=${xzn}`)                
-                await arxzy.sendMessage(from, {
+                await conn.sendMessage(from, {
                     text: d.result
                 }, { quoted: m})
             }
@@ -2253,13 +2233,13 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             /*
             case 'ytplay':
             case 'play':{
-               if (!isPremium) return newReply(mess.prem)
-               if (!q) return newReply('Search?')
+               if (!isPremium) return m.reply(mess.prem)
+               if (!q) return m.reply('Search?')
                let h = await fetchJson(`https://api.lolhuman.xyz/api/ytplay?apikey=${lol}&query=${q}`)
                let { audio, title, thumbnail, description, duration, view, uploader} = h.result
                let mono = '```'
                let tks = `*YT PLAY*\n\n${mono}Title: ${title}\nDuration: ${duration}\nViews: ${view}\nFrom Channel: ${uploader}\nDescription: ${description}${mono}`
-               await arxzy.sendMessage(m.chat, {
+               await conn.sendMessage(m.chat, {
                         document: {
                            url: audio.link
                         },
@@ -2286,10 +2266,10 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             */
             case 'tiktok':
             case 'ttdl':
-                if (!q) return newReply('where is the link')
+                if (!q) return m.reply('where is the link')
                 let e = await fetchJson(`https://api.lolhuman.xyz/api/tiktok?apikey=${lol}&url=${q}`)
                 let ee = `*DOWNLOADER TIKTOK*\n\n_Creator:_ ${e.result.author.username} / (${e.result.author.nickname}\n_Title:_ ${e.result.title}\n_Durasi:_ ${e.result.duration}\n_Views:_ ${e.result.statistic.play_count}_Likes:_ ${e.result.statistic.like_count}\n`
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     video: {
                         url: e.result.link
                     },
@@ -2301,9 +2281,9 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
 
             case 'tiktokaudio':
             case 'ttaudio': {
-                if (!q) return newReply('where is the link')
+                if (!q) return m.reply('where is the link')
                 let i = await fetchJson(`https://api.lolhuman.xyz/api/tiktokmusic?apikey=${lol}&url=${q}`)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     audio: {
                         url: i.result
                     },
@@ -2314,9 +2294,9 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             }
             break
             case 'cocofun':
-                if (!q) return newReply('where is the link')
+                if (!q) return m.reply('where is the link')
                 let j = await fetchJson(`https://api.lolhuman.xyz/api/cocofun?apikey=${lol}&url=${q}`)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     video: {
                         url: j.result.nowm
                     },
@@ -2326,9 +2306,9 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 })
                 break
             case 'mediafire':
-                if (!q) return newReply('where is the link')
+                if (!q) return m.reply('where is the link')
                 let ha = await fetchJson(`https://api.lolhuman.xyz/api/mediafire?apikey=${lol}&url=${q}`)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     document: {
                         url: ha.result.link
                     },
@@ -2339,9 +2319,9 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 break
             case 'pin':
             case 'pindl':
-                if (!q) return newReply('where is the link')
+                if (!q) return m.reply('where is the link')
                 let l = await fetchJson(`https://api.lolhuman.xyz/api/pinterestdl?apikey=${lol}&url=${q}`)
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     video: {
                         url: l.result
                     }
@@ -2351,9 +2331,9 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 break
             case 'snackvideo':
             case 'sv':
-                if (!q) return newReply('where is the link')
+                if (!q) return m.reply('where is the link')
                 let ma = await fetchJson(`https://api.lolhuman.xyz/api/snackvideo?apikey=${lol}&url=${q}`)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     video: {
                         url: ma.result.url
                     },
@@ -2363,11 +2343,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 })
                 break
             case 'ytmp4': {
-                if (!q) return newReply('where is the link')
+                if (!q) return m.reply('where is the link')
                 let n = await fetchJson(`https://api.lolhuman.xyz/api/ytvideo?apikey=${lol}&url=${q}`)
                 let mono = '```'
                 let ytmp4p = `${mono}Downloader Youtube\n\nTitle: ${n.result.title}\nDiUpload Oleh: ${n.result.uploader}\nLinkChannel: ${n.result.channel}\nDurasi Video: ${n.result.duration}\nDitonton Sebanyak: ${n.result.view}${mono}`
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     document: {
                         url: n.result.link.link
                     },
@@ -2391,11 +2371,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 }
                 break
             case 'ytmp3': {
-                if (!q) return newReply('where is the link')
+                if (!q) return m.reply('where is the link')
                 let n = await fetchJson(`https://api.lolhuman.xyz/api/ytaudio?apikey=${lol}&url=${q}`)
                 let mono = '```'
                 let ytmp4p = `${mono}Downloader Youtube\n\nTitle: ${n.result.title}\nDiUpload Oleh: ${n.result.uploader}\nLinkChannel: ${n.result.channel}\nDurasi Video: ${n.result.duration}\nDitonton Sebanyak: ${n.result.view}${mono}`
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     document: {
                         url: n.result.link.link
                     },
@@ -2421,11 +2401,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             case 'igdl': 
             case 'ig':
             case 'instagram': {
-                if (!q) return newReply("Link?")
+                if (!q) return m.reply("Link?")
                 let ag = await fetchJson(`https://api.lolhuman.xyz/api/instagram?apikey=${lol}&url=${q}`)
                 for (var i = 0; i < ag.result.length; i++) {
                     let pap = ag.result[i].includes('.jpg') ? 'image' : 'video'
-                    await arxzy.sendMessage(m.chat, {
+                    await conn.sendMessage(m.chat, {
                         [pap]: {
                             url: ag.result[i]
                         },
@@ -2437,11 +2417,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             }
             break
             case 'pindl': {
-                if (!q) return newReply("Link?")
+                if (!q) return m.reply("Link?")
                 let apacuba = await fetchJson(`https://api.lolhuman.xyz/api/pinterestdl?apikey=${lol}&url=${q}`)
                 for (var i = 0; i < apacuba.result.length; i++) {
                     let pap = apacuba.result[i].includes('.jpg') ? 'image' : 'video'
-                    await arxzy.sendMessage(m.chat, {
+                    await conn.sendMessage(m.chat, {
                         [pap]: {
                             url: apacuba.result[i]
                         },
@@ -2454,11 +2434,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             break
             case 'igdlh':
             case 'highlights': {
-                if (!q) return newReply('Link?')
+                if (!q) return m.reply('Link?')
                 let ap = await fetchJson(`https://api.lolhuman.xyz/api/ig-highlights?apikey=${lol}&url=${q}`)
                 for (var oa = 0; oa < ap.result.length; oa++) {
                     let pap = ap.result[oa].includes('.jpg') ? 'image' : 'video'
-                    await arxzy.sendMessage(m.chat, {
+                    await conn.sendMessage(m.chat, {
                         [pap]: {
                             url: ap.result[oa]
                         },
@@ -2475,24 +2455,24 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 const {
                     quote
                 } = require('./lib/quote.js')
-                if (!q) return newReply('Masukan Text')
+                if (!q) return m.reply('Masukan Text')
                 try {
-                  let ppnyauser = await await arxzy.profilePictureUrl(m.sender, 'image').catch(_ => 'https://telegra.ph/file/6880771a42bad09dd6087.jpg')
+                  let ppnyauser = await await conn.profilePictureUrl(m.sender, 'image').catch(_ => 'https://telegra.ph/file/6880771a42bad09dd6087.jpg')
                   const rest = await quote(q, pushname, ppnyauser)
-                  newReply(mess.wait)
-                  arxzy.sendImageAsSticker(m.chat, rest.result, m, {
+                  m.reply(mess.wait)
+                  conn.sendImageAsSticker(m.chat, rest.result, m, {
                     packname: `${global.packname}`,
                     author: `${global.author}`
                   })
                 } catch {
-                  newReply(mess.error)
+                  m.reply(mess.error)
                 }
             }
             break
             case 'ttp':
-                if (!q) return newReply('Masukan Text')
-                newReply(mess.wait)
-                arxzy.sendMessage(m.chat, {
+                if (!q) return m.reply('Masukan Text')
+                m.reply(mess.wait)
+                conn.sendMessage(m.chat, {
                     sticker: {
                         url: `https://api.lolhuman.xyz/api/ttp?apikey=${lol}&text=${q}`
                     }
@@ -2501,9 +2481,9 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                 })
                 break
             case 'attp':
-                if (!q) return newReply('Masukan Text')
-                newReply(mess.wait)
-                arxzy.sendMessage(m.chat, {
+                if (!q) return m.reply('Masukan Text')
+                m.reply(mess.wait)
+                conn.sendMessage(m.chat, {
                     sticker: {
                         url: `https://api.lolhuman.xyz/api/attp?apikey=${lol}&text=${q}`
                     }
@@ -2514,11 +2494,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
 
             case 'remini':
             case 'hd': {
-                // if (!isPremium) return newReply(mess.prem)
-                if (!isMedia) return newReply("Where The A Image")
-                let media = await arxzy.downloadAndSaveMediaMessage(quoted)
+                // if (!isPremium) return m.reply(mess.prem)
+                if (!isMedia) return m.reply("Where The A Image")
+                let media = await conn.downloadAndSaveMediaMessage(quoted)
                 let anu = await TelegraPh(media)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     image: {
                         url: `https://api.lolhuman.xyz/api/upscale?apikey=${lol}&img=${anu}`
                     },
@@ -2529,11 +2509,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             }
             break
             case 'reminiv2': {
-                if (!isPremium) return newReply(mess.prem)
-                if (!isMedia) return newReply("Where The A Image")
-                let media = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isPremium) return m.reply(mess.prem)
+                if (!isMedia) return m.reply("Where The A Image")
+                let media = await conn.downloadAndSaveMediaMessage(quoted)
                 let anu = await TelegraPh(media)
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     image: {
                         url: `https://xzn.wtf/api/torch-srgan?url=${anu}&apikey=${xzn}`
                     },
@@ -2544,11 +2524,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             }
             break
             case 'recolor': {
-                if (!isPremium) return newReply(mess.prem)
-                if (!isMedia) return newReply("Where The A Image")
-                let media = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isPremium) return m.reply(mess.prem)
+                if (!isMedia) return m.reply("Where The A Image")
+                let media = await conn.downloadAndSaveMediaMessage(quoted)
                 let anu = await TelegraPh(media)
-                await arxzy.sendMessage(m.chat, {
+                await conn.sendMessage(m.chat, {
                     image: {
                         url: `https://xzn.wtf/api/colorizer?url=${anu}&&apikey=${xzn}`
                     },
@@ -2560,10 +2540,10 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
             break
             case 'removebg':
             case 'nobg': {
-                if (!isMedia) return newReply("Where The A Image")
-                let media = await arxzy.downloadAndSaveMediaMessage(quoted)
+                if (!isMedia) return m.reply("Where The A Image")
+                let media = await conn.downloadAndSaveMediaMessage(quoted)
                 let anu = await TelegraPh(media)
-                arxzy.sendMessage(m.chat, {
+                conn.sendMessage(m.chat, {
                     image: {
                         url: `https://api.lolhuman.xyz/api/removebg?apikey=${lol}&img=${anu}`
                     },
@@ -2576,11 +2556,11 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
 
             case 'tele':
             case 'telestick': {
-                if (!isPremium) return newReply(mess.prem)
-                if (!q) return newReply("Link?")
+                if (!isPremium) return m.reply(mess.prem)
+                if (!q) return m.reply("Link?")
                 let agg = await fetchJson(`https://api.lolhuman.xyz/api/telestick?apikey=${lol}&url=${q}`)
                 for (var ki = 0; ki < agg.result.sticker.length; ki++) {
-                    await arxzy.sendImageAsSticker(m.chat, agg.result.sticker[ki], m, {
+                    await conn.sendImageAsSticker(m.chat, agg.result.sticker[ki], m, {
                         packname: packname,
                         author: author
                     })
@@ -2615,14 +2595,14 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                     if (/smooth/.test(command)) set = '-filter:v "minterpolate=\'mi_mode=mci:mc_mode=aobmc:vsbmc=1:fps=120\'"'
                     if (/tupai/.test(command)) set = '-filter:a "atempo=0.5,asetrate=65100"'
                     if (/audio/.test(mime)) {
-                        newReply(mess.wait)
-                        let media = await arxzy.downloadAndSaveMediaMessage(qmsg)
+                        m.reply(mess.wait)
+                        let media = await conn.downloadAndSaveMediaMessage(qmsg)
                         let ran = getRandom('.mp3')
                         exec(`ffmpeg -i ${media} ${set} ${ran}`, (err, stderr, stdout) => {
                             fs.unlinkSync(media)
-                            if (err) return newReply(err)
+                            if (err) return m.reply(err)
                             let buff = fs.readFileSync(ran)
-                            arxzy.sendMessage(m.chat, {
+                            conn.sendMessage(m.chat, {
                                 audio: buff,
                                 mimetype: 'audio/mpeg'
                             }, {
@@ -2630,9 +2610,9 @@ Silahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
                             })
                             fs.unlinkSync(ran)
                         })
-                    } else newReply(`Balas audio yang ingin diubah dengan caption *${prefix + command}*`)
+                    } else m.reply(`Balas audio yang ingin diubah dengan caption *${prefix + command}*`)
                 } catch (e) {
-                    newReply(e)
+                    m.reply(e)
                 }
             }
             break
@@ -2795,14 +2775,14 @@ ${prefix}removebg
 ${prefix}ytplay *[error]*
 ${prefix}remini${mono}`
                 if (typemenu === 'v1') {
-                    arxzy.sendMessage(m.chat, {
+                    conn.sendMessage(m.chat, {
                         image: fs.readFileSync('./media/menu.jpg'),
                         caption: menunya
                     }, {
                         quoted: m
                     })
                 } else if (typemenu === 'v2') {
-                    arxzy.sendMessage(m.chat, {
+                    conn.sendMessage(m.chat, {
                         text: menunya,
                         contextInfo: {
                             externalAdReply: {
@@ -2819,7 +2799,7 @@ ${prefix}remini${mono}`
                         quoted: m
                     })
                 } else if (typemenu === 'v3') {
-                    arxzy.sendMessage(m.chat, {
+                    conn.sendMessage(m.chat, {
                         video: fs.readFileSync('./media/menu.mp4'),
                         caption: menunya,
                         gifPlayback: true
@@ -2827,7 +2807,7 @@ ${prefix}remini${mono}`
                         quoted: m
                     })
                 } else if (typemenu === 'v4') {
-                    arxzy.relayMessage(m.chat, {
+                    conn.relayMessage(m.chat, {
                         scheduledCallCreationMessage: {
                            callType: "AUDIO",
                            scheduledTimestampMs: 1200,
@@ -2840,10 +2820,10 @@ ${prefix}remini${mono}`
                   if (isSimi && body != undefined) {
                      // res = await fetchJson(`https://api.lolhuman.xyz/api/simi?apikey=${lol}&text=${body}&badword=true`)
                      res = await fetchJson(`https://api.simsimi.net/v2/?text=${body}&lc=id`)
-                     newReply(res.success)
+                     m.reply(res.success)
                   }
                 if (budy.startsWith('=>')) {
-                    if (!isCreator) return newReply(mess.owner)
+                    if (!isCreator) return m.reply(mess.owner)
 
                     function Return(sul) {
                         sat = JSON.stringify(sul, null, 2)
@@ -2851,35 +2831,35 @@ ${prefix}remini${mono}`
                         if (sat == undefined) {
                             bang = util.format(sul)
                         }
-                        return newReply(bang)
+                        return m.reply(bang)
                     }
                     try {
-                        newReply(util.format(eval(`(async () => { return ${budy.slice(3)} })()`)))
+                        m.reply(util.format(eval(`(async () => { return ${budy.slice(3)} })()`)))
                     } catch (e) {
-                        newReply(String(e))
+                        m.reply(String(e))
                     }
                 }
 
                 if (budy.startsWith('>')) {
-                    if (!isCreator) return newReply(mess.owner)
+                    if (!isCreator) return m.reply(mess.owner)
                     try {
                         let evaled = await eval(budy.slice(2))
                         if (typeof evaled !== 'string') evaled = require('util').inspect(evaled)
-                        await newReply(evaled)
+                        await m.reply(evaled)
                     } catch (err) {
-                        await newReply(String(err))
+                        await m.reply(String(err))
                     }
                 }
                 if (budy.startsWith('$')) {
-                    if (!isCreator) return newReply(mess.owner)
+                    if (!isCreator) return m.reply(mess.owner)
                     exec(budy.slice(2), (err, stdout) => {
-                        if (err) return newReply(err)
-                        if (stdout) return newReply(stdout)
+                        if (err) return m.reply(err)
+                        if (stdout) return m.reply(stdout)
                     })
                 }
         }
     } catch (err) {
-        arxzy.sendText(numberowner + '@s.whatsapp.net', util.format(err), m)
+        conn.sendText(numberowner + '@s.whatsapp.net', util.format(err), m)
         console.log(util.format(err))
     }
 }
